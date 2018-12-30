@@ -1,7 +1,7 @@
 # sonoff-lan-mode-homeassistant
 Home Assistant platform to control Sonoff switches running the latest Itead firmware, locally (LAN mode).
 
-**This will only work for Sonoff devices running a recent version of the stock (Itead / eWeLink) firmware.**
+**This will only work for Sonoff devices running a recent version of the stock (Itead / eWeLink) firmware, which have been blocked from accessing the internet (to put them in LAN Mode).**
 
 This is a simple platform to control switch devices which can normally only be controlled using the Itead cloud app (eWeLink). It may be useful to you if you've bought a Sonoff device and want to control it locally, but cannot flash firmware such as Tasmota for whatever reason (e.g. lack of tools or confidence soldering).
 
