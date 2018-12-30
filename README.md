@@ -10,16 +10,14 @@ This is a simple platform to control switch devices which can normally only be c
 - Sonoff S26
 - Sonoff S85
 - Sonoff T1 UK/US/EU 1 Gang
-- S30
+- Sonoff S30 
+- Sonoff S31 Lite
 - Sonoff Basic
 - Sonoff RF 
-- Slampher
+- Sonoff Slampher
 - Sonoff SV
 - Sonoff Touch EU/US
-- S31 Lite
-- 1 Channel Inching/Self-locking Mode Wifi wireless Switch 5V/12V
-- Inching/Self-locking Wifi Wireless Switch 5V
-- Any other eWeLink-compatible device running firmware version 1.8.0 or later
+- Any other Sonoff / eWeLink device running firmware version 1.8.0 or later
 
 ## What is LAN Mode?
 Since mid 2018, the firmware Itead have shipped with Sonoff devices has provided a feature called "LAN Mode" which allows the device to be controlled directly on the local network using a WebSocket connection on port 8081.
@@ -28,11 +26,14 @@ The feature is designed to only be used when there is no connection to the Itead
 
 ## Setup
 Before you can use this platform to control your Sonoff from Home Assistant, you should perform the following setup steps:
-- First, add/initialise the Sonoff device normally using the eWeLink app, including connecting it to your home WiFi network etc.
-- Check you can switch the device on/off "normally" (via the Itead cloud) using the eWeLink app.
-- Find out the IP address of the device, and give it a static local IP address so it can't get a different IP address from your router's DHCP server. You can usually do this from the admin page of most home broadband routers (look for "DHCP").
-- Now, block it from accessing the internet at all. There are several ways you can do this, but I used the "IP Filtering" page in my home broadband router again, blocking all IP ranges except 192.168.0.0/24 for the Sonoff's IP address.
-- Wait a couple of minutes for the Sonoff LED to start flashing (two flashes every 2 seconds) - this means it has given up trying to connect to Itead servers and is now in "LAN mode".
+1. Initialise the Sonoff device normally using the eWeLink app, connecting it to your home WiFi network etc.
+2. Check you can switch the device on/off "normally" (via the Itead cloud) using the eWeLink app.
+3. Find out the IP address of the device, and make that IP address static on your router so this doesn't change in future.
+    - You can usually do this from the admin page of most home broadband routers (look for "DHCP").
+4. Block the Sonoff from accessing the internet at all, but ensure it can still talk to other devices in your home network.
+    - I used the "IP Filtering" page in my home broadband router again, blocking all IP ranges except 192.168.0.0/24 for the Sonoff's IP address.
+5. Wait a couple of minutes for the Sonoff LED to start flashing (two flashes every 2 seconds).
+    - This means it has given up trying to connect to Itead servers, and is now in "LAN mode".
 
 Congrats, you can now uninstall the eWeLink app - you'll won't need it again as your Sonoff can now be controlled directly via WebSocket messages on port 8081!
 
