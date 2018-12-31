@@ -56,3 +56,12 @@ switch:
     host: 192.168.0.72
     icon: mdi:bulb
 ```
+
+## Future
+
+I'm aware this platform is very primitive at the moment, with no error handling, caching or even status checking implemented yet. I'll probably try and improve it a bit myself, but I'm new to Home Assistant so contributions are very much welcome!
+
+For anyone else who is interested in debugging / reverse engineering the Sonoff "LAN mode" protocol, here's a packet capture I made showing the whole interaction between my internet-access-blocked Sonoff and the eWeLink app, enabling LAN mode, finding the Sonoff and switching it on/off a couple of times:
+https://www.dropbox.com/s/qwmkcjnvkdf8a8u/30-12-2018-12.10-filtered-sonoff.pcap?dl=0
+
+
