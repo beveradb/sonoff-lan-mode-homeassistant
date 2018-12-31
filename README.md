@@ -48,6 +48,7 @@ switch:
     icon: // [Optional] Custom icon for device
 ```
 
+Example:
 ```
   - platform: sonoff_lan_mode
     name: Kitchen Ceiling
