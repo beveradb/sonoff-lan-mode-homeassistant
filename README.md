@@ -50,6 +50,7 @@ switch:
 
 Example:
 ```
+switch:
   - platform: sonoff_lan_mode
     name: Kitchen Ceiling
     host: 192.168.0.72
