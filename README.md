@@ -45,4 +45,12 @@ switch:
   - platform: sonoff_lan_mode
     name: // Switch Name
     host: // Local IP address of device
+    icon: // [Optional] Custom icon for device
+```
+
+```
+  - platform: sonoff_lan_mode
+    name: Kitchen Ceiling
+    host: 192.168.0.72
+    icon: mdi:bulb
 ```
