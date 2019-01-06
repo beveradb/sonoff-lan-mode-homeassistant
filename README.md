@@ -24,6 +24,8 @@ Since mid 2018, the firmware Itead have shipped with Sonoff devices has provided
 
 The feature is designed to only be used when there is no connection to the Itead cloud servers (e.g. if your internet connection is down, or their servers are down). As such, it is only enabled when the device is connected to your WiFi network, but unable to reach the Itead servers. You can find out more about the feature in the [Itead FAQ page](https://help.ewelink.cc/hc/en-us/articles/360007134171-LAN-Mode-Tutorial).
 
+Here's a video demonstration of a Sonoff Basic being controlled in LAN mode: [https://www.youtube.com/watch?v=sxtt2cNm8g8](https://www.youtube.com/watch?v=sxtt2cNm8g8)
+
 ## Setup
 Before you can use this platform to control your Sonoff from Home Assistant, you should perform the following setup steps:
 1. Initialise the Sonoff device normally using the eWeLink app, connecting it to your home WiFi network etc.
