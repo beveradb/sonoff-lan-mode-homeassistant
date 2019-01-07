@@ -11,7 +11,8 @@ import homeassistant.helpers.config_validation as cv
 from time import time
 import json
 from venv import logger
-from websocket import create_connection
+
+REQUIREMENTS = ['websocket-client=0.54.0']
 
 SWITCH_SCHEMA = vol.Schema({
     vol.Optional(CONF_ID, default=1): cv.string,
@@ -29,6 +30,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
 
 
 def set_sonoff_state(host, state):
+    from websocket import create_connection
     timestamp = str(time()).replace('.', '')
     ws = create_connection("ws://" + host + ":8081/")
 
