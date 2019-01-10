@@ -12,7 +12,7 @@ from time import time
 import json
 from venv import logger
 
-REQUIREMENTS = ['websocket-client=0.54.0']
+REQUIREMENTS = ['websocket-client==0.54.0']
 
 SWITCH_SCHEMA = vol.Schema({
     vol.Optional(CONF_ID, default=1): cv.string,
