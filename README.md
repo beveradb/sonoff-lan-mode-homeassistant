@@ -5,7 +5,7 @@ Home Assistant platform to control Sonoff switches running the latest Itead firm
 
 This is a simple platform to control switch devices which can normally only be controlled using the Itead cloud app (eWeLink). It may be useful to you if you've bought a Sonoff device and want to control it locally, but cannot flash firmware such as [Tasmota](https://github.com/arendst/Sonoff-Tasmota/) for whatever reason (e.g. lack of tools or confidence soldering).
 
-## Supported devices (running firmware 1.8.0 or later):
+## Supported devices * (running firmware 1.8.0 or later):
 - Sonoff S20
 - Sonoff S26
 - Sonoff S85
@@ -18,6 +18,8 @@ This is a simple platform to control switch devices which can normally only be c
 - Sonoff SV
 - Sonoff Touch EU/US
 - Any other Sonoff / eWeLink device running firmware version 1.8.0 or later
+
+* - I currently only own a Sonoff Basic so haven't actually tested with these devices. However, I am very confident that if your device works with the eWeLink app in LAN Mode, we can get it working with this component - we might need a bit of joint investigation (e.g. `tcpdump` of communication from app) first to get it working!
 
 ## What is LAN Mode?
 Since mid 2018, the firmware Itead have shipped with Sonoff devices has provided a feature called "LAN Mode" which allows the device to be controlled directly on the local network using a WebSocket connection on port 8081.
