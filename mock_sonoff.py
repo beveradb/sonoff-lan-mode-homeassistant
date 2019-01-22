@@ -107,7 +107,7 @@ class MockSonoff:
                     'class': 'logging.handlers.RotatingFileHandler',
                     'formatter': 'default',
                     'filename': log_path,
-                    'maxBytes': 4096,
+                    'maxBytes': 10000,
                     'backupCount': 3
                 }
             },
