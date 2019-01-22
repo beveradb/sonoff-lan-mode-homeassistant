@@ -10,10 +10,10 @@ This is a simple platform to control switch devices which can normally only be c
 - Sonoff S26
 - Sonoff S85
 - Sonoff T1 UK/US/EU 1 Gang
-- Sonoff S30 
+- Sonoff S30
 - Sonoff S31 Lite
 - Sonoff Basic
-- Sonoff RF 
+- Sonoff RF
 - Sonoff Slampher
 - Sonoff SV
 - Sonoff Touch EU/US
@@ -40,6 +40,9 @@ Before you can use this platform to control your Sonoff from Home Assistant, you
     - This means it has given up trying to connect to Itead servers, and is now in "LAN mode".
 
 Congrats, you can now uninstall the eWeLink app - you'll won't need it again as your Sonoff can now be controlled directly via WebSocket messages on port 8081!
+
+You can not boot to lan directly, so you can only block the internet access after the device is
+setup. Note that you will need to perform these steps every time you boot your Sonoff device.
 
 ## Installation
 To use this platform, copy sonoff_lan_mode.py to "<home assistant config dir>/custom_components/switch" and add the config below to configuration.yaml
