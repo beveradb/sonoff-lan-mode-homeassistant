@@ -14,15 +14,15 @@ class Sonoff(object):
 
         self.logger.debug('Sonoff class initialising')
 
-        self._wshost = "echo.websocket.org"  # Replace with local LAN IP, e.g. 192.168.0.112
-        self._wsport = "80"  # Replace with "8081" to connect to LAN mode Sonoff
-
+        self._wshost = "localhost"  # Replace with local LAN IP, e.g. 192.168.0.112
+        self._wsport = "8081"
         self._wsendpoint = "/"
+
         self._ws = None
         self._devices = []
 
         self.thread = threading.Thread(target=self.init_websocket(self.logger))
-        self.thread.daemon = True
+        self.thread.daemon = False
         self.thread.start()
 
     # Listen for state updates from HASS and update the device accordingly
@@ -103,28 +103,39 @@ class Sonoff(object):
 
         data = json.loads(data)
 
-        self.logger.debug('websocket action: %s', data['action'])
+        if 'action' in data:
+            self.logger.debug('websocket action: %s', data['action'])
 
-        if 'action' in data and data['action'] == 'update' and 'params' in data:
-            self.logger.debug('found update action in websocket update msg')
-            if 'switch' in data['params'] or 'switches' in data['params']:
-                self.logger.debug('found switch/switches in websocket update msg')
+            if data['action'] == 'update' and 'params' in data:
+                self.logger.debug('found update action in websocket update msg')
+                if 'switch' in data['params'] or 'switches' in data['params']:
+                    self.logger.debug('found switch/switches in websocket update msg')
 
-                self.logger.debug(
-                    'searching for deviceid: {} in known devices {}'.format(self._devices.__str__(), data['deviceid'])
-                )
+                    self.logger.debug(
+                        'searching for deviceid: {} in known devices {}'.format(self._devices.__str__(),
+                                                                                data['deviceid'])
+                    )
 
-                for idx, device in enumerate(self._devices):
-                    if device['deviceid'] == data['deviceid']:
-                        self._devices[idx]['params'] = data['params']
+                    found_device = False
+                    for idx, device in enumerate(self._devices):
+                        if device['deviceid'] == data['deviceid']:
+                            self._devices[idx]['params'] = data['params']
+                            found_device = True
 
-                        if 'switches' in data['params']:
-                            for switch in data['params']['switches']:
-                                self.set_entity_state(data['deviceid'], data['params']['switch'], switch['outlet'])
-                        else:
-                            self.set_entity_state(data['deviceid'], data['params']['switch'])
+                            if 'switches' in data['params']:
+                                for switch in data['params']['switches']:
+                                    self.set_entity_state(data['deviceid'], data['params']['switch'], switch['outlet'])
+                            else:
+                                self.set_entity_state(data['deviceid'], data['params']['switch'])
 
-                        break  # do not remove
+                            break
+
+                    if not found_device:
+                        self.logger.debug('device not found in known devices, adding')
+                        self.add_device(data)
+
+        elif 'deviceid' in data:
+            self.logger.debug('received hello from deviceid: %s, no action required', data['deviceid'])
 
     def on_error(self, *args):
         error = args[-1]  # to accommodate the case when the function receives 2 or 3 args
@@ -134,13 +145,11 @@ class Sonoff(object):
         entity_id = 'switch.%s%s' % (deviceid, '_' + str(outlet + 1) if outlet is not None else '')
         self.logger.debug("(Not yet implemented!) Updating HASS state for entity: `%s` to state: %s", entity_id, state)
 
-    def update_devices(self):
+    def add_device(self, device):
+        self._devices.append(device)
         return self._devices
 
-    def get_devices(self, force_update=False):
-        if force_update:
-            return self.update_devices()
-
+    def get_devices(self):
         return self._devices
 
     def get_device(self, deviceid):
