@@ -84,17 +84,17 @@ class Sonoff(object):
 
     def init_websocket(self, logger):
         self.logger = logger
+        self.logger.debug('initializing websocket')
 
-        # keep websocket open indefinitely
-        while True:
-            self.logger.debug('(re)init websocket')
-            self._ws = WebsocketListener(sonoff=self, on_message=self.on_message, on_error=self.on_error)
+        self._ws = WebsocketListener(sonoff=self, on_message=self.on_message, on_error=self.on_error)
 
-            try:
-                # 145 interval is defined by the first websocket response after login
-                self._ws.run_forever(ping_interval=10)
-            finally:
-                self._ws.close()
+        try:
+            # 145 interval is defined by the first websocket response after login
+            self._ws.run_forever(ping_interval=145)
+        except:
+            self.logger.debug('websocket error occurred, shutting down')
+        finally:
+            self._ws.close()
 
     def on_message(self, *args):
         data = args[-1]  # to accommodate the weird behaviour where the function receives 2 or 3 args
