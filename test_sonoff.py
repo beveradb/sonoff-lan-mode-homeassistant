@@ -7,10 +7,9 @@ import logging
 import logging.config
 
 
-class Sonoff(object):
-    def __init__(self, logconfig):
-        logging.config.dictConfig(logconfig)
-        self.logger = logging.getLogger(__name__)
+class Sonoff:
+    def __init__(self):
+        self.logger = self.configure_logger('default', 'test_sonoff.log')
 
         self.logger.debug('Sonoff class initialising')
 
@@ -43,10 +42,10 @@ class Sonoff(object):
         outlet = event.data['outlet']
 
         if outlet is not None:
-            self.logger.debug("Switching `%s - %s` on outlet %d to state: %s", device['deviceid'], device['name'],
-                              (outlet + 1), new_state)
+            self.logger.info("Switching `%s - %s` on outlet %d to state: %s", device['deviceid'], device['name'],
+                             (outlet + 1), new_state)
         else:
-            self.logger.debug("Switching `%s` to state: %s", device['deviceid'], new_state)
+            self.logger.info("Switching `%s` to state: %s", device['deviceid'], new_state)
 
         if not device:
             self.logger.error('unknown device to be updated')
@@ -92,7 +91,7 @@ class Sonoff(object):
             # 145 interval is defined by the first websocket response after login
             self._ws.run_forever(ping_interval=145)
         except:
-            self.logger.debug('websocket error occurred, shutting down')
+            self.logger.error('websocket error occurred, shutting down')
         finally:
             self._ws.close()
 
@@ -104,7 +103,7 @@ class Sonoff(object):
         data = json.loads(data)
 
         if 'action' in data:
-            self.logger.debug('websocket action: %s', data['action'])
+            self.logger.info('received action: %s', data['action'])
 
             if data['action'] == 'update' and 'params' in data:
                 self.logger.debug('found update action in websocket update msg')
@@ -143,7 +142,7 @@ class Sonoff(object):
 
     def set_entity_state(self, deviceid, state, outlet=None):
         entity_id = 'switch.%s%s' % (deviceid, '_' + str(outlet + 1) if outlet is not None else '')
-        self.logger.debug("(Not yet implemented!) Updating HASS state for entity: `%s` to state: %s", entity_id, state)
+        self.logger.info("Success! TODO: update HASS state for entity: `%s` to state: %s", entity_id, state)
 
     def add_device(self, device):
         self._devices.append(device)
@@ -168,6 +167,38 @@ class Sonoff(object):
 
     def get_wsendpoint(self):
         return self._wsendpoint
+
+    def configure_logger(self, name, log_path):
+        logging.config.dictConfig({
+            'version': 1,
+            'formatters': {
+                'default': {'format': '%(asctime)s - %(levelname)s - %(message)s', 'datefmt': '%Y-%m-%d %H:%M:%S'}
+            },
+            'handlers': {
+                'console': {
+                    'level': 'DEBUG',
+                    'class': 'logging.StreamHandler',
+                    'formatter': 'default',
+                    'stream': 'ext://sys.stdout'
+                },
+                'file': {
+                    'level': 'DEBUG',
+                    'class': 'logging.handlers.RotatingFileHandler',
+                    'formatter': 'default',
+                    'filename': log_path,
+                    'maxBytes': 4096,
+                    'backupCount': 3
+                }
+            },
+            'loggers': {
+                'default': {
+                    'level': 'DEBUG',
+                    'handlers': ['console', 'file']
+                }
+            },
+            'disable_existing_loggers': False
+        })
+        return logging.getLogger(name)
 
 
 class WebsocketListener(threading.Thread, websocket.WebSocketApp):
@@ -233,18 +264,4 @@ class WebsocketListener(threading.Thread, websocket.WebSocketApp):
 
 
 if __name__ == '__main__':
-    Sonoff({
-        'version': 1,
-        "handlers": {
-            "console": {
-                "class": "logging.StreamHandler",
-                "stream": "ext://sys.stdout"
-            },
-        },
-        "root": {
-            "level": "DEBUG",
-            "handlers": [
-                "console",
-            ]
-        }
-    })
+    Sonoff()

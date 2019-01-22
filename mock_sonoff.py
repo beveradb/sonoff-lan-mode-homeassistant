@@ -7,10 +7,9 @@ import time
 from websocket_server import WebsocketServer
 
 
-class MockSonoff(object):
-    def __init__(self, logconfig):
-        logging.config.dictConfig(logconfig)
-        self.logger = logging.getLogger(__name__)
+class MockSonoff:
+    def __init__(self):
+        self.logger = self.configure_logger('default', 'mock_sonoff.log')
         self.logger.debug('MockSonoff class initialising')
 
         self.server = None
@@ -24,7 +23,7 @@ class MockSonoff(object):
     def init_websocket(self):
         self.logger.debug('Running websocket server on port 8081 to simulate Sonoff')
 
-        self.server = WebsocketServer(8081, '127.0.0.1', logging.DEBUG)
+        self.server = WebsocketServer(8081, '127.0.0.1', logging.ERROR)
         self.server.set_fn_new_client(self.new_client)
         self.server.set_fn_client_left(self.client_left)
         self.server.set_fn_message_received(self.on_message)
@@ -90,20 +89,38 @@ class MockSonoff(object):
                 }
             }))
 
+    def configure_logger(self, name, log_path):
+        logging.config.dictConfig({
+            'version': 1,
+            'formatters': {
+                'default': {'format': '%(asctime)s - %(levelname)s - %(message)s', 'datefmt': '%Y-%m-%d %H:%M:%S'}
+            },
+            'handlers': {
+                'console': {
+                    'level': 'DEBUG',
+                    'class': 'logging.StreamHandler',
+                    'formatter': 'default',
+                    'stream': 'ext://sys.stdout'
+                },
+                'file': {
+                    'level': 'DEBUG',
+                    'class': 'logging.handlers.RotatingFileHandler',
+                    'formatter': 'default',
+                    'filename': log_path,
+                    'maxBytes': 4096,
+                    'backupCount': 3
+                }
+            },
+            'loggers': {
+                'default': {
+                    'level': 'DEBUG',
+                    'handlers': ['console', 'file']
+                }
+            },
+            'disable_existing_loggers': False
+        })
+        return logging.getLogger(name)
+
 
 if __name__ == '__main__':
-    MockSonoff({
-        'version': 1,
-        "handlers": {
-            "console": {
-                "class": "logging.StreamHandler",
-                "stream": "ext://sys.stdout"
-            },
-        },
-        "root": {
-            "level": "DEBUG",
-            "handlers": [
-                "console",
-            ]
-        }
-    })
+    MockSonoff()
