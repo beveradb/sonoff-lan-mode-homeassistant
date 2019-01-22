@@ -1,10 +1,19 @@
-import logging, time, hmac, hashlib, random, base64, json, socket, requests, re, threading, websocket
+import json
+import random
+import threading
+import time
+import websocket
+import logging
+import logging.config
 
-_LOGGER = logging.getLogger(__name__)
 
+class Sonoff(object):
+    def __init__(self, logconfig):
+        logging.config.dictConfig(logconfig)
+        self.logger = logging.getLogger(__name__)
 
-class Sonoff:
-    def __init__(self):
+        self.logger.debug('Sonoff class initialising')
+
         self._wshost = "echo.websocket.org"  # Replace with local LAN IP, e.g. 192.168.0.112
         self._wsport = "80"  # Replace with "8081" to connect to LAN mode Sonoff
 
@@ -12,17 +21,17 @@ class Sonoff:
         self._ws = None
         self._devices = []
 
-        self.thread = threading.Thread(target=self.init_websocket)
+        self.thread = threading.Thread(target=self.init_websocket(self.logger))
         self.thread.daemon = True
         self.thread.start()
 
     # Listen for state updates from HASS and update the device accordingly
     async def state_listener(self, event):
         if not self.get_ws().connected:
-            _LOGGER.error('websocket is not connected')
+            self.logger.error('websocket is not connected')
             return
 
-        _LOGGER.debug('received state event change from: %s' % event.data['deviceid'])
+        self.logger.debug('received state event change from: %s' % event.data['deviceid'])
 
         new_state = event.data['state']
 
@@ -34,13 +43,13 @@ class Sonoff:
         outlet = event.data['outlet']
 
         if outlet is not None:
-            _LOGGER.debug("Switching `%s - %s` on outlet %d to state: %s", device['deviceid'], device['name'],
-                          (outlet + 1), new_state)
+            self.logger.debug("Switching `%s - %s` on outlet %d to state: %s", device['deviceid'], device['name'],
+                              (outlet + 1), new_state)
         else:
-            _LOGGER.debug("Switching `%s` to state: %s", device['deviceid'], new_state)
+            self.logger.debug("Switching `%s` to state: %s", device['deviceid'], new_state)
 
         if not device:
-            _LOGGER.error('unknown device to be updated')
+            self.logger.error('unknown device to be updated')
             return False
 
         if outlet is not None:
@@ -61,6 +70,8 @@ class Sonoff:
             'ts': 0
         }
 
+        self.logger.debug('sending state update websocket msg: %s', json.dumps(payload))
+
         self.get_ws().send(json.dumps(payload))
 
         # set also the pseudo-internal state of the device until the real refresh kicks in
@@ -71,26 +82,38 @@ class Sonoff:
                 else:
                     self._devices[idxd]['params']['switch'] = new_state
 
-    def init_websocket(self):
+    def init_websocket(self, logger):
+        self.logger = logger
+
         # keep websocket open indefinitely
         while True:
-            _LOGGER.debug('(re)init websocket')
+            self.logger.debug('(re)init websocket')
             self._ws = WebsocketListener(sonoff=self, on_message=self.on_message, on_error=self.on_error)
 
             try:
                 # 145 interval is defined by the first websocket response after login
-                self._ws.run_forever(ping_interval=145)
+                self._ws.run_forever(ping_interval=5)
             finally:
                 self._ws.close()
 
     def on_message(self, *args):
         data = args[-1]  # to accommodate the weird behaviour where the function receives 2 or 3 args
 
-        _LOGGER.debug('websocket msg: %s', data)
+        self.logger.debug('received websocket msg: %s', data)
 
         data = json.loads(data)
+
+        self.logger.debug('websocket action: %s', data['action'])
+
         if 'action' in data and data['action'] == 'update' and 'params' in data:
+            self.logger.debug('found update action in websocket update msg')
             if 'switch' in data['params'] or 'switches' in data['params']:
+                self.logger.debug('found switch/switches in websocket update msg')
+
+                self.logger.debug(
+                    'searching for deviceid: {} in known devices {}'.format(self._devices.__str__(), data['deviceid'])
+                )
+
                 for idx, device in enumerate(self._devices):
                     if device['deviceid'] == data['deviceid']:
                         self._devices[idx]['params'] = data['params']
@@ -105,11 +128,11 @@ class Sonoff:
 
     def on_error(self, *args):
         error = args[-1]  # to accommodate the case when the function receives 2 or 3 args
-        _LOGGER.error('websocket error: %s' % str(error))
+        self.logger.error('websocket error: %s' % str(error))
 
     def set_entity_state(self, deviceid, state, outlet=None):
         entity_id = 'switch.%s%s' % (deviceid, '_' + str(outlet + 1) if outlet is not None else '')
-        _LOGGER.debug("(Not yet implemented!) Updating HASS state for entity: `%s` to state: %s", entity_id, state)
+        self.logger.debug("(Not yet implemented!) Updating HASS state for entity: `%s` to state: %s", entity_id, state)
 
     def update_devices(self):
         return self._devices
@@ -140,6 +163,9 @@ class Sonoff:
 
 class WebsocketListener(threading.Thread, websocket.WebSocketApp):
     def __init__(self, sonoff, on_message=None, on_error=None):
+        self.logger = sonoff.logger
+        self.logger.warning('WebsocketListener initialising...')
+
         self._sonoff = sonoff
 
         threading.Thread.__init__(self)
@@ -153,6 +179,7 @@ class WebsocketListener(threading.Thread, websocket.WebSocketApp):
 
         self.connected = False
         self.last_update = time.time()
+        self.logger.warning('WebsocketListener initialised')
 
     def on_open(self, *args):
         self.connected = True
@@ -173,15 +200,42 @@ class WebsocketListener(threading.Thread, websocket.WebSocketApp):
             'sequence': str(time.time()).replace('.', '')
         }
 
+        self.logger.debug('sending user online websocket msg: %s', json.dumps(payload))
+
         self.send(json.dumps(payload))
 
     def on_close(self, *args):
-        _LOGGER.debug('websocket closed')
+        self.logger.debug('websocket closed')
         self.connected = False
 
-    def run_forever(self, sockopt=None, sslopt=None, ping_interval=0, ping_timeout=None):
+    def run_forever(self, sockopt=None, sslopt=None, ping_interval=0, ping_timeout=None,
+                    http_proxy_host=None, http_proxy_port=None,
+                    http_no_proxy=None, http_proxy_auth=None,
+                    skip_utf8_validation=False,
+                    host=None, origin=None, dispatcher=None,
+                    suppress_origin=False, proxy_type=None):
+        self.logger.debug('attempting to call WebSocketApp run_forever')
+
         websocket.WebSocketApp.run_forever(self,
                                            sockopt=sockopt,
                                            sslopt=sslopt,
                                            ping_interval=ping_interval,
                                            ping_timeout=ping_timeout)
+
+
+if __name__ == '__main__':
+    Sonoff({
+        'version': 1,
+        "handlers": {
+            "console": {
+                "class": "logging.StreamHandler",
+                "stream": "ext://sys.stdout"
+            },
+        },
+        "root": {
+            "level": "DEBUG",
+            "handlers": [
+                "console",
+            ]
+        }
+    })
