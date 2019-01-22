@@ -92,7 +92,7 @@ class Sonoff(object):
 
             try:
                 # 145 interval is defined by the first websocket response after login
-                self._ws.run_forever(ping_interval=5)
+                self._ws.run_forever(ping_interval=10)
             finally:
                 self._ws.close()
 
@@ -208,13 +208,13 @@ class WebsocketListener(threading.Thread, websocket.WebSocketApp):
         self.logger.debug('websocket closed')
         self.connected = False
 
-    def run_forever(self, sockopt=None, sslopt=None, ping_interval=0, ping_timeout=None,
+    def run_forever(self, sockopt=None, sslopt=None, ping_interval=5, ping_timeout=None,
                     http_proxy_host=None, http_proxy_port=None,
                     http_no_proxy=None, http_proxy_auth=None,
                     skip_utf8_validation=False,
                     host=None, origin=None, dispatcher=None,
                     suppress_origin=False, proxy_type=None):
-        self.logger.debug('attempting to call WebSocketApp run_forever')
+        self.logger.debug('attempting to call WebSocketApp run_forever with ping_interval: {}'.format(ping_interval))
 
         websocket.WebSocketApp.run_forever(self,
                                            sockopt=sockopt,
