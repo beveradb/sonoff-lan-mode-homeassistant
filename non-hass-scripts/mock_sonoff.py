@@ -1,3 +1,8 @@
+# This script can be used to simulate a real Sonoff device in LAN mode, to test 2-way communication with other code.
+# When executed (e.g. from a terminal with `python mock_sonoff.py`), it will open a WebSocket server on port 8081,
+# allowing you to connect to this mock Sonoff device with other code designed to simulate the eWeLink mobile app.
+# Any messages sent or received are logged to the log file 'mock_sonoff.log' for further research.
+
 import json
 import logging
 import logging.config

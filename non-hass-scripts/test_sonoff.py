@@ -1,10 +1,17 @@
+# This script can be used to test 2-way communication with a Sonoff device in LAN mode.
+# When executed (e.g. from a terminal with `python test_sonoff.py`), it will open a WebSocket connection on port 8081
+# to the device on the IP address you specify below, simulating the eWeLink mobile app.
+# Any messages sent to or received by the device are logged to the log file 'test_sonoff.log' for further research.
+
+SONOFF_LAN_IP = "192.168.0.XXX"  # Replace with the IP address of the Sonoff you want to test, e.g. "192.168.0.112"
+
 import json
 import random
 import threading
 import time
-import websocket
 import logging
 import logging.config
+import websocket
 
 
 class Sonoff:
@@ -13,7 +20,7 @@ class Sonoff:
 
         self.logger.debug('Sonoff class initialising')
 
-        self._wshost = "localhost"  # Replace with local LAN IP, e.g. 192.168.0.112
+        self._wshost = SONOFF_LAN_IP
         self._wsport = "8081"
         self._wsendpoint = "/"
 
