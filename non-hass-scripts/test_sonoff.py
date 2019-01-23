@@ -6,7 +6,7 @@
 # Any messages sent to or received by the device are logged to the log file 'test_sonoff.log' for further research.
 
 SONOFF_LAN_IP = "localhost"  # Replace with the IP address of the Sonoff you want to test, e.g. "192.168.0.112"
-LOG_LEVEL = "INFO"
+LOG_LEVEL = "DEBUG"
 
 import json
 import random
