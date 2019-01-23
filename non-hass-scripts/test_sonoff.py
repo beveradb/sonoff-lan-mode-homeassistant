@@ -1,9 +1,12 @@
+#!/usr/bin/env python3
+
 # This script can be used to test 2-way communication with a Sonoff device in LAN mode.
 # When executed (e.g. from a terminal with `python test_sonoff.py`), it will open a WebSocket connection on port 8081
 # to the device on the IP address you specify below, simulating the eWeLink mobile app.
 # Any messages sent to or received by the device are logged to the log file 'test_sonoff.log' for further research.
 
-SONOFF_LAN_IP = "192.168.0.XXX"  # Replace with the IP address of the Sonoff you want to test, e.g. "192.168.0.112"
+SONOFF_LAN_IP = "localhost"  # Replace with the IP address of the Sonoff you want to test, e.g. "192.168.0.112"
+LOG_LEVEL = "INFO"
 
 import json
 import random
@@ -199,7 +202,7 @@ class Sonoff:
             },
             'loggers': {
                 'default': {
-                    'level': 'DEBUG',
+                    'level': LOG_LEVEL,
                     'handlers': ['console', 'file']
                 }
             },
@@ -211,14 +214,16 @@ class Sonoff:
 class WebsocketListener(threading.Thread, websocket.WebSocketApp):
     def __init__(self, sonoff, on_message=None, on_error=None):
         self.logger = sonoff.logger
-        self.logger.warning('WebsocketListener initialising...')
-
         self._sonoff = sonoff
 
+        websocket_host = 'ws://{}:{}{}'.format(self._sonoff.get_wshost(),
+                                               self._sonoff.get_wsport(),
+                                               self._sonoff.get_wsendpoint())
+
+        self.logger.info('WebsocketListener initialising, connecting to host: %s' % websocket_host)
+
         threading.Thread.__init__(self)
-        websocket.WebSocketApp.__init__(self, 'ws://{}:{}{}'.format(self._sonoff.get_wshost(),
-                                                                    self._sonoff.get_wsport(),
-                                                                    self._sonoff.get_wsendpoint()),
+        websocket.WebSocketApp.__init__(self, websocket_host,
                                         on_open=self.on_open,
                                         on_error=on_error,
                                         on_message=on_message,
@@ -226,7 +231,6 @@ class WebsocketListener(threading.Thread, websocket.WebSocketApp):
 
         self.connected = False
         self.last_update = time.time()
-        self.logger.warning('WebsocketListener initialised')
 
     def on_open(self, *args):
         self.connected = True

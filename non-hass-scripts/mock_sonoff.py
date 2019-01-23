@@ -1,14 +1,17 @@
+#!/usr/bin/env python3
+
 # This script can be used to simulate a real Sonoff device in LAN mode, to test 2-way communication with other code.
 # When executed (e.g. from a terminal with `python mock_sonoff.py`), it will open a WebSocket server on port 8081,
 # allowing you to connect to this mock Sonoff device with other code designed to simulate the eWeLink mobile app.
 # Any messages sent or received are logged to the log file 'mock_sonoff.log' for further research.
+
+LOG_LEVEL = "DEBUG"
 
 import json
 import logging
 import logging.config
 import threading
 import time
-
 from websocket_server import WebsocketServer
 
 
@@ -18,15 +21,16 @@ class MockSonoff:
         self.logger.debug('MockSonoff class initialising')
 
         self.server = None
-        websocket_thread = threading.Thread(target=self.init_websocket)
+        websocket_thread = threading.Thread(target=self.init_websocket(self.logger))
         websocket_thread.daemon = True
         websocket_thread.start()
 
         while True:
             time.sleep(1)
 
-    def init_websocket(self):
-        self.logger.debug('Running websocket server on port 8081 to simulate Sonoff')
+    def init_websocket(self, logger):
+        self.logger = logger
+        self.logger.info('Running websocket server on localhost port 8081 to simulate Sonoff')
 
         self.server = WebsocketServer(8081, '127.0.0.1', logging.ERROR)
         self.server.set_fn_new_client(self.new_client)
@@ -47,7 +51,7 @@ class MockSonoff:
         self.logger.debug('Action: %s' % data['action'])
 
         if 'action' in data and data['action'] == 'userOnline':
-            self.logger.debug('Found userOnline action, sending simulated hello response')
+            self.logger.info('Received userOnline action, sending simulated hello response')
             self.server.send_message_to_all(json.dumps({
                 "error": 0,
                 "apikey": "09a15816-c289-4333-bf7b-aa52ffafdf96",
@@ -55,7 +59,7 @@ class MockSonoff:
                 "deviceid": "100060af40"
             }))
 
-            self.logger.debug('Waiting 1 second, then sending simulated initial switch state')
+            self.logger.info('Waiting 1 second, then sending simulated initial switch state')
             time.sleep(1)
 
             self.server.send_message_to_all(json.dumps({
@@ -80,10 +84,10 @@ class MockSonoff:
             #     }
             # }))
 
-            self.logger.debug('Now waiting 10 seconds before simulating manual switch ON')
+            self.logger.info('Now waiting 10 seconds before simulating manual switch ON')
             time.sleep(10)
 
-            self.logger.debug("Sending simulated switch ON message to client %d" % client['id'])
+            self.logger.info("Sending simulated switch ON message to client %d" % client['id'])
             self.server.send_message_to_all(json.dumps({
                 "userAgent": "device",
                 "apikey": "09a15816-c289-4333-bf7b-aa52ffafdf96",
@@ -95,6 +99,10 @@ class MockSonoff:
             }))
 
     def configure_logger(self, name, log_path):
+        # Fix for duplicate log entries caused by basic config initialisation inside websocket-server module
+        default_logger = logging.getLogger()
+        default_logger.handlers = []
+
         logging.config.dictConfig({
             'version': 1,
             'formatters': {
@@ -118,11 +126,11 @@ class MockSonoff:
             },
             'loggers': {
                 'default': {
-                    'level': 'DEBUG',
+                    'level': LOG_LEVEL,
                     'handlers': ['console', 'file']
                 }
             },
-            'disable_existing_loggers': False
+            'disable_existing_loggers': True
         })
         return logging.getLogger(name)
 
