@@ -5,7 +5,9 @@
 # allowing you to connect to this mock Sonoff device with other code designed to simulate the eWeLink mobile app.
 # Any messages sent or received are logged to the log file 'mock_sonoff.log' for further research.
 
-LOG_LEVEL = "DEBUG"
+LOG_LEVEL = "INFO"
+MULTI_OUTLET = True
+MOMENTARY = True
 
 import json
 import logging
@@ -62,41 +64,72 @@ class MockSonoff:
             self.logger.info('Waiting 1 second, then sending simulated initial switch state')
             time.sleep(1)
 
-            self.server.send_message_to_all(json.dumps({
-                "userAgent": "device",
-                "apikey": "09a15816-c289-4333-bf7b-aa52ffafdf96",
-                "deviceid": "100060af40",
-                "action": "update",
-                "params": {
-                    "switch": "off"
-                }
-            }))
-
-            # WIP: This mocks the multi-outlet device provided by user PlayedIn in issue #6
-            # self.server.send_message_to_all(json.dumps({
-            #     "userAgent": "device",
-            #     "apikey": "nonce",
-            #     "deviceid": "100040e943",
-            #     "action": "update",
-            #     "params": {
-            #         "switches": [{"switch": "off", "outlet": 0}, {"switch": "off", "outlet": 1},
-            #                      {"switch": "off", "outlet": 2}, {"switch": "off", "outlet": 3}]
-            #     }
-            # }))
+            if MULTI_OUTLET:
+                self.server.send_message_to_all(json.dumps({
+                    "userAgent": "device",
+                    "apikey": "nonce",
+                    "deviceid": "100060af40",
+                    "action": "update",
+                    "params": {
+                        "switches": [{"switch": "off", "outlet": 0}, {"switch": "off", "outlet": 1},
+                                     {"switch": "off", "outlet": 2}, {"switch": "off", "outlet": 3}]
+                    }
+                }))
+            else:
+                self.server.send_message_to_all(json.dumps({
+                    "userAgent": "device",
+                    "apikey": "09a15816-c289-4333-bf7b-aa52ffafdf96",
+                    "deviceid": "100060af40",
+                    "action": "update",
+                    "params": {
+                        "switch": "off"
+                    }
+                }))
 
             self.logger.info('Now waiting 10 seconds before simulating manual switch ON')
             time.sleep(10)
 
-            self.logger.info("Sending simulated switch ON message to client %d" % client['id'])
-            self.server.send_message_to_all(json.dumps({
-                "userAgent": "device",
-                "apikey": "09a15816-c289-4333-bf7b-aa52ffafdf96",
-                "deviceid": "100060af40",
-                "action": "update",
-                "params": {
-                    "switch": "on"
-                }
-            }))
+            if MULTI_OUTLET:
+                self.logger.info("Sending Outlet 1 ON message to client %d" % client['id'])
+                self.server.send_message_to_all(json.dumps({
+                    "userAgent": "device",
+                    "apikey": "apikey",
+                    "deviceid": "100040e943",
+                    "action": "update",
+                    "params": {
+                        "switches": [
+                            {"switch": "on", "outlet": 1}
+                        ]
+                    }
+                }))
+
+                if MOMENTARY:
+                    self.logger.info("Waiting 1 second, then sending Outlet 1 OFF message for momentary switch")
+                    time.sleep(1)
+
+                    self.server.send_message_to_all(json.dumps({
+                        "userAgent": "device",
+                        "apikey": "apikey",
+                        "deviceid": "100040e943",
+                        "action": "update",
+                        "params": {
+                            "switches": [
+                                {"switch": "off", "outlet": 1}
+                            ]
+                        }
+                    }))
+
+            else:
+                self.logger.info("Sending switch ON message to client %d" % client['id'])
+                self.server.send_message_to_all(json.dumps({
+                    "userAgent": "device",
+                    "apikey": "09a15816-c289-4333-bf7b-aa52ffafdf96",
+                    "deviceid": "100060af40",
+                    "action": "update",
+                    "params": {
+                        "switch": "on"
+                    }
+                }))
 
     def configure_logger(self, name, log_path):
         # Fix for duplicate log entries caused by basic config initialisation inside websocket-server module
