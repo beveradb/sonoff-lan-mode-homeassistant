@@ -10,6 +10,7 @@ from homeassistant.const import (CONF_NAME, CONF_HOST, CONF_ID, CONF_SWITCHES, C
 import homeassistant.helpers.config_validation as cv
 from time import time
 import json
+from websocket import create_connection
 from venv import logger
 
 REQUIREMENTS = ['websocket-client==0.54.0']
@@ -29,28 +30,8 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
 })
 
 
-def set_sonoff_state(host, state):
-    from websocket import create_connection
+def set_sonoff_state(sonoffDevice, state):
     timestamp = str(time()).replace('.', '')
-    ws = create_connection("ws://" + host + ":8081/")
-
-    initiate_session_message_json = json.dumps(
-        {
-            "action": "userOnline",
-            "ts": timestamp,
-            "version": 6,
-            "apikey": "nonce",
-            "sequence": timestamp,
-            "userAgent": "app"
-        }
-    )
-
-    print("Initiating session: " + initiate_session_message_json)
-    ws.send(initiate_session_message_json)
-
-    response_message = ws.recv()
-    print("Response: '%s'" % response_message)
-
     update_state_message_json = json.dumps(
         {
             "action": "update",
@@ -66,24 +47,24 @@ def set_sonoff_state(host, state):
     )
 
     print("Updating state: " + update_state_message_json)
-    ws.send(update_state_message_json)
+    sonoffDevice.GetWS().send(update_state_message_json)
 
-    response_message = ws.recv()
+    response_message = sonoffDevice.GetWS().recv()
     print("Response: '%s'" % response_message)
-
-    print("Closing WebSocket")
-    ws.close()
 
 
 class SonoffDevice(SwitchDevice):
-    """Representation of a Sonoff switch."""
 
-    def __init__(self, host, name, icon):
+    """Representation of a Sonoff switch."""
+    def __init__(self, host, port, name, icon):
         """Initialize the Sonoff switch."""
         self._host = host
+        self._port = port
         self._name = name
         self._icon = icon
         self._state = False
+        self._ws = None
+        self.init_ws_connection()
 
     @property
     def name(self):
@@ -100,6 +81,10 @@ class SonoffDevice(SwitchDevice):
         """Return the icon."""
         return self._icon
 
+    @property
+    def GetWS(self):
+        return self._ws
+
     def turn_on(self, **kwargs):
         """Turn Sonoff switch on."""
         set_sonoff_state(self._host, "on")
@@ -110,28 +95,49 @@ class SonoffDevice(SwitchDevice):
         set_sonoff_state(self._host, "off")
         self._state = False
 
+    def init_ws_connection(self):
+
+        timestamp = str(time()).replace('.', '')
+
+        wsAddress = "ws://" + self._host + ":8081/"
+        self._ws = create_connection("ws://" + self._host + ":8081/")
+        logger.info("connecting to " + wsAddress)
+        initiate_session_message_json = json.dumps(
+            {
+                "action": "userOnline",
+                "ts": timestamp,
+                "version": 6,
+                "apikey": "nonce",
+                "sequence": timestamp,
+                "userAgent": "app"
+            }
+        )
+
+        print("Initiating session: " + initiate_session_message_json)
+        self._ws.send(initiate_session_message_json)
+
+        response_message = self._ws.recv()
+        print("Response: '%s'" % response_message)
+
 
 def setup_platform(hass, config, add_devices, discovery_info=None):
     devices = config.get(CONF_SWITCHES)
     switches = []
 
     for object_id, device_config in devices.items():
-        switches.append(
-            SonoffDevice(
-                config.get(CONF_HOST),
-                device_config.get(CONF_FRIENDLY_NAME, object_id),
-                device_config.get(CONF_ICON)
-            )
-        )
+        add_sonoff_devie(config, 8081, device_config.get(CONF_FRIENDLY_NAME, object_id))
 
     name = config.get(CONF_NAME)
+
     if name:
-        switches.append(
-            SonoffDevice(
-                config.get(CONF_HOST),
-                name,
-                config.get(CONF_ICON)
-            )
-        )
+        switches.append(add_sonoff_devie(config, 8081, name))
 
     add_devices(switches)
+
+def add_sonoff_devie(config, port, name):
+    SonoffDevice(
+        config.get(CONF_HOST),
+        8081,
+        name,
+        config.get(CONF_ICON)
+    )
