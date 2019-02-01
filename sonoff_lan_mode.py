@@ -10,8 +10,7 @@ import logging
 
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
-from homeassistant.components.switch import (
-    SwitchDevice, PLATFORM_SCHEMA)
+from homeassistant.components.switch import (SwitchDevice, PLATFORM_SCHEMA)
 from homeassistant.const import (CONF_HOST, CONF_NAME)
 
 REQUIREMENTS = ['pysonofflan>=0.1.7']
@@ -28,22 +27,27 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
 
 def setup_platform(hass, config, add_entities, discovery_info=None):
     """Set up the Sonoff LAN Mode Switch platform."""
-    from pysonofflan import SonoffSwitch
     host = config.get(CONF_HOST)
     name = config.get(CONF_NAME)
 
-    add_entities([HassSonoffSwitch(SonoffSwitch(host), name)], True)
+    add_entities([HassSonoffSwitch(host, name)], True)
 
 
 class HassSonoffSwitch(SwitchDevice):
     """Home Assistant representation of a Sonoff LAN Mode device."""
-    from pysonofflan import SonoffSwitch
 
-    def __init__(self, device: SonoffSwitch, name):
-        self.device = device
+    def __init__(self, host, name):
+        from pysonofflan import SonoffSwitch
         self._name = name
         self._state = None
         self._available = True
+        self.shared_state = {"hass_self": self}
+        self.sonoffdevice = SonoffSwitch(
+            host=host,
+            callback_after_update=self.device_update_callback,
+            shared_state=self.shared_state,
+            logger=_LOGGER
+        )
 
     @property
     def name(self):
@@ -59,20 +63,25 @@ class HassSonoffSwitch(SwitchDevice):
         """Return true if switch is on."""
         return self._state
 
-    def turn_on(self, **kwargs):
+    async def turn_on(self, **kwargs):
         """Turn the switch on."""
-        self.device.turn_on()
+        await self.sonoffdevice.turn_on()
 
-    def turn_off(self, **kwargs):
+    async def turn_off(self, **kwargs):
         """Turn the switch off."""
-        self.device.turn_off()
+        await self.sonoffdevice.turn_off()
 
-    def update(self):
+    async def device_update_callback(self, callback_self):
+        """Handle state updates announced by the device itself."""
+        self._state = \
+            self.sonoffdevice.state == \
+            self.sonoffdevice.SWITCH_STATE_ON
+
+    async def update(self):
         """Update the device state."""
         try:
-            self._state = self.device.state == self.device.SWITCH_STATE_ON
-            self._available = True
-
+            self._state = self.sonoffdevice.state == \
+                          self.sonoffdevice.SWITCH_STATE_ON
         except (Exception, OSError) as ex:
             if self._available:
                 _LOGGER.warning(
