@@ -1,143 +1,80 @@
 """
-Simple platform to control Sonoff switch devices in LAN Mode
+Support for Sonoff smart home devices, such as smart switches (e.g. Sonoff
+Basic), plugs (e.g. Sonoff S20), and wall switches (e.g. Sonoff Touch),
+when these devices are in "LAN Mode", directly over the local network.
 
 For more details about this platform, please refer to the documentation at
 https://github.com/beveradb/sonoff-lan-mode-homeassistant
 """
-import voluptuous as vol
-from homeassistant.components.switch import SwitchDevice, PLATFORM_SCHEMA
-from homeassistant.const import (CONF_NAME, CONF_HOST, CONF_ID, CONF_SWITCHES, CONF_FRIENDLY_NAME, CONF_ICON)
+import logging
+
 import homeassistant.helpers.config_validation as cv
-from time import time
-import json
-from venv import logger
+import voluptuous as vol
+from homeassistant.components.switch import (
+    SwitchDevice, PLATFORM_SCHEMA)
+from homeassistant.const import (CONF_HOST, CONF_NAME)
 
-REQUIREMENTS = ['websocket-client==0.54.0']
+REQUIREMENTS = ['pysonofflan>=0.1.7']
 
-SWITCH_SCHEMA = vol.Schema({
-    vol.Optional(CONF_ID, default=1): cv.string,
-    vol.Optional(CONF_FRIENDLY_NAME): cv.string,
-})
+_LOGGER = logging.getLogger(__name__)
+
+DEFAULT_NAME = 'Sonoff Switch'
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
-    vol.Optional(CONF_NAME): cv.string,
-    vol.Optional(CONF_ICON): cv.icon,
     vol.Required(CONF_HOST): cv.string,
-    vol.Optional(CONF_ID, default=1): cv.string,
-    vol.Optional(CONF_SWITCHES, default={}):
-        vol.Schema({cv.slug: SWITCH_SCHEMA}),
+    vol.Optional(CONF_NAME, default=DEFAULT_NAME): cv.string,
 })
 
 
-def set_sonoff_state(sonoff_device, state):
-    timestamp = str(time()).replace('.', '')
-    update_state_message_json = json.dumps(
-        {
-            "action": "update",
-            "deviceid": "nonce",
-            "apikey": "nonce",
-            "selfApikey": "nonce",
-            "params": {
-                "switch": state
-            },
-            "sequence": timestamp,
-            "userAgent": "app"
-        }
-    )
+def setup_platform(hass, config, add_entities, discovery_info=None):
+    """Set up the Sonoff LAN Mode Switch platform."""
+    from pysonofflan import SonoffSwitch
+    host = config.get(CONF_HOST)
+    name = config.get(CONF_NAME)
 
-    print("Updating state: " + update_state_message_json)
-    sonoff_device.get_ws.send(update_state_message_json)
-
-    response_message = sonoff_device.get_ws.recv()
-    print("Response: '%s'" % response_message)
+    add_entities([HassSonoffSwitch(SonoffSwitch(host), name)], True)
 
 
-class SonoffDevice(SwitchDevice):
-    """Representation of a Sonoff switch."""
+class HassSonoffSwitch(SwitchDevice):
+    """Home Assistant representation of a Sonoff LAN Mode device."""
+    from pysonofflan import SonoffSwitch
 
-    def __init__(self, host, port, name, icon):
-        """Initialize the Sonoff switch."""
-        self._host = host
-        self._port = port
+    def __init__(self, device: SonoffSwitch, name):
+        self.device = device
         self._name = name
-        self._icon = icon
-        self._state = False
-        self._ws = None
-        self.init_ws_connection()
+        self._state = None
+        self._available = True
 
     @property
     def name(self):
-        """Get name of Sonoff switch."""
         return self._name
 
     @property
+    def available(self) -> bool:
+        """Return if switch is available."""
+        return self._available
+
+    @property
     def is_on(self):
-        """Check if Sonoff switch is on."""
+        """Return true if switch is on."""
         return self._state
 
-    @property
-    def icon(self):
-        """Return the icon."""
-        return self._icon
-
-    @property
-    def get_ws(self):
-        return self._ws
-
     def turn_on(self, **kwargs):
-        """Turn Sonoff switch on."""
-        set_sonoff_state(self, "on")
-        self._state = True
+        """Turn the switch on."""
+        self.device.turn_on()
 
     def turn_off(self, **kwargs):
-        """Turn Sonoff switch off."""
-        set_sonoff_state(self, "off")
-        self._state = False
+        """Turn the switch off."""
+        self.device.turn_off()
 
-    def init_ws_connection(self):
-        from websocket import create_connection
-        timestamp = str(time()).replace('.', '')
+    def update(self):
+        """Update the device state."""
+        try:
+            self._state = self.device.state == self.device.SWITCH_STATE_ON
+            self._available = True
 
-        ws_address = "ws://" + self._host + ":8081/"
-        self._ws = create_connection("ws://" + self._host + ":8081/")
-        logger.info("connecting to " + ws_address)
-        initiate_session_message_json = json.dumps(
-            {
-                "action": "userOnline",
-                "ts": timestamp,
-                "version": 6,
-                "apikey": "nonce",
-                "sequence": timestamp,
-                "userAgent": "app"
-            }
-        )
-
-        print("Initiating session: " + initiate_session_message_json)
-        self._ws.send(initiate_session_message_json)
-
-        response_message = self._ws.recv()
-        print("Response: '%s'" % response_message)
-
-
-def setup_platform(hass, config, add_devices, discovery_info=None):
-    devices = config.get(CONF_SWITCHES)
-    switches = []
-
-    for object_id, device_config in devices.items():
-        add_sonoff_device(config, 8081, device_config.get(CONF_FRIENDLY_NAME, object_id))
-
-    name = config.get(CONF_NAME)
-
-    if name:
-        switches.append(add_sonoff_device(config, 8081, name))
-
-    add_devices(switches)
-
-
-def add_sonoff_device(config, port, name):
-    return SonoffDevice(
-        config.get(CONF_HOST),
-        port,
-        name,
-        config.get(CONF_ICON)
-    )
+        except (Exception, OSError) as ex:
+            if self._available:
+                _LOGGER.warning(
+                    "Could not read state for %s: %s", self.name, ex)
+                self._available = False

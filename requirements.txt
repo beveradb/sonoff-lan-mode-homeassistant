@@ -1,3 +1,4 @@
+pysonofflan
 aiohttp==3.5.4
 asn1crypto==0.24.0
 astral==1.7.1
