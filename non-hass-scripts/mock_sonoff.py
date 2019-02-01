@@ -17,7 +17,8 @@ import time
 from websocket_server import *
 
 LOG_LEVEL = "DEBUG"
-SIMULATE_TOGGLE = True
+SIMULATE_TOGGLE = False
+TOGGLE_DELAY = 30
 MULTI_OUTLET = False
 MOMENTARY = False
 
@@ -140,39 +141,40 @@ class MockSonoff:
                 "deviceid": "100060af40"
             }))
 
+            self.logger.info(
+                'Waiting 1 second, then sending simulated initial '
+                'switch state')
+            time.sleep(1)
+
+            if MULTI_OUTLET:
+                self.server.send_message_to_all(json.dumps({
+                    "userAgent": "device",
+                    "apikey": "nonce",
+                    "deviceid": "100060af40",
+                    "action": "update",
+                    "params": {
+                        "switches": [{"switch": "off", "outlet": 0},
+                                     {"switch": "off", "outlet": 1},
+                                     {"switch": "off", "outlet": 2},
+                                     {"switch": "off", "outlet": 3}]
+                    }
+                }))
+            else:
+                self.server.send_message_to_all(json.dumps({
+                    "userAgent": "device",
+                    "apikey": "09a15816-c289-4333-bf7b-aa52ffafdf96",
+                    "deviceid": "100060af40",
+                    "action": "update",
+                    "params": {
+                        "switch": "off"
+                    }
+                }))
+
             if SIMULATE_TOGGLE:
-                self.logger.info(
-                    'Waiting 1 second, then sending simulated initial '
-                    'switch state')
-                time.sleep(1)
-
-                if MULTI_OUTLET:
-                    self.server.send_message_to_all(json.dumps({
-                        "userAgent": "device",
-                        "apikey": "nonce",
-                        "deviceid": "100060af40",
-                        "action": "update",
-                        "params": {
-                            "switches": [{"switch": "off", "outlet": 0},
-                                         {"switch": "off", "outlet": 1},
-                                         {"switch": "off", "outlet": 2},
-                                         {"switch": "off", "outlet": 3}]
-                        }
-                    }))
-                else:
-                    self.server.send_message_to_all(json.dumps({
-                        "userAgent": "device",
-                        "apikey": "09a15816-c289-4333-bf7b-aa52ffafdf96",
-                        "deviceid": "100060af40",
-                        "action": "update",
-                        "params": {
-                            "switch": "off"
-                        }
-                    }))
 
                 self.logger.info(
-                    'Now waiting 10s before simulating manual switch ON')
-                time.sleep(10)
+                    'Now waiting %s seconds before simulating manual switch ON' % TOGGLE_DELAY)
+                time.sleep(TOGGLE_DELAY)
 
                 if MULTI_OUTLET:
                     self.logger.info(
