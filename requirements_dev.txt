@@ -18,7 +18,7 @@ PyJWT==1.7.1
 pysonofflan>=0.2.0
 python-slugify==2.0.1
 pytz==2018.9
-PyYAML==3.13
+pyyaml>=4.2b1
 requests==2.21.0
 ruamel.yaml==0.15.87
 six==1.12.0
