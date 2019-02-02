@@ -20,7 +20,7 @@ python-slugify==2.0.1
 pytz==2018.9
 PyYAML==3.13
 requests==2.21.0
-ruamel.yaml==0.15.85
+ruamel.yaml==0.15.87
 six==1.12.0
 Unidecode==1.0.23
 urllib3==1.24.1
