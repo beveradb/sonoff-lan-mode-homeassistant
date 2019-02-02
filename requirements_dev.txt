@@ -7,7 +7,7 @@ bcrypt==3.1.6
 certifi==2018.11.29
 cffi==1.11.5
 chardet==3.0.4
-cryptography==2.3.1
+cryptography==2.5
 homeassistant==0.86.2
 idna==2.8
 Jinja2==2.10
