@@ -1,137 +1,119 @@
 """
-Simple platform to control Sonoff switch devices in LAN Mode
+Support for Sonoff smart home devices, such as smart switches (e.g. Sonoff
+Basic), plugs (e.g. Sonoff S20), and wall switches (e.g. Sonoff Touch),
+when these devices are in "LAN Mode", directly over the local network.
 
 For more details about this platform, please refer to the documentation at
 https://github.com/beveradb/sonoff-lan-mode-homeassistant
 """
-import voluptuous as vol
-from homeassistant.components.switch import SwitchDevice, PLATFORM_SCHEMA
-from homeassistant.const import (CONF_NAME, CONF_HOST, CONF_ID, CONF_SWITCHES, CONF_FRIENDLY_NAME, CONF_ICON)
+import logging
+
 import homeassistant.helpers.config_validation as cv
-from time import time
-import json
-from venv import logger
+import voluptuous as vol
+from homeassistant.components.switch import (SwitchDevice, PLATFORM_SCHEMA)
+from homeassistant.const import CONF_HOST, CONF_NAME
 
-REQUIREMENTS = ['websocket-client==0.54.0']
+REQUIREMENTS = ['pysonofflan>=0.2.1']
 
-SWITCH_SCHEMA = vol.Schema({
-    vol.Optional(CONF_ID, default=1): cv.string,
-    vol.Optional(CONF_FRIENDLY_NAME): cv.string,
-})
+_LOGGER = logging.getLogger('homeassistant.components.switch.sonoff_lan_mode')
+
+DEFAULT_NAME = 'Sonoff Switch'
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
-    vol.Optional(CONF_NAME): cv.string,
-    vol.Optional(CONF_ICON): cv.icon,
     vol.Required(CONF_HOST): cv.string,
-    vol.Optional(CONF_ID, default=1): cv.string,
-    vol.Optional(CONF_SWITCHES, default={}):
-        vol.Schema({cv.slug: SWITCH_SCHEMA}),
+    vol.Optional(CONF_NAME, default=DEFAULT_NAME): cv.string,
 })
 
 
-def set_sonoff_state(host, state):
-    from websocket import create_connection
-    timestamp = str(time()).replace('.', '')
-    ws = create_connection("ws://" + host + ":8081/")
+async def async_setup_platform(hass, config, async_add_entities,
+                               discovery_info=None):
+    """Set up the Sonoff LAN Mode Switch platform."""
+    host = config.get(CONF_HOST)
+    name = config.get(CONF_NAME)
 
-    initiate_session_message_json = json.dumps(
-        {
-            "action": "userOnline",
-            "ts": timestamp,
-            "version": 6,
-            "apikey": "nonce",
-            "sequence": timestamp,
-            "userAgent": "app"
-        }
-    )
-
-    print("Initiating session: " + initiate_session_message_json)
-    ws.send(initiate_session_message_json)
-
-    response_message = ws.recv()
-    print("Response: '%s'" % response_message)
-
-    update_state_message_json = json.dumps(
-        {
-            "action": "update",
-            "deviceid": "nonce",
-            "apikey": "nonce",
-            "selfApikey": "nonce",
-            "params": {
-                "switch": state
-            },
-            "sequence": timestamp,
-            "userAgent": "app"
-        }
-    )
-
-    print("Updating state: " + update_state_message_json)
-    ws.send(update_state_message_json)
-
-    response_message = ws.recv()
-    print("Response: '%s'" % response_message)
-
-    print("Closing WebSocket")
-    ws.close()
+    async_add_entities([HassSonoffSwitch(hass, host, name)], True)
 
 
-class SonoffDevice(SwitchDevice):
-    """Representation of a Sonoff switch."""
+class HassSonoffSwitch(SwitchDevice):
+    """Home Assistant representation of a Sonoff LAN Mode device."""
 
-    def __init__(self, host, name, icon):
-        """Initialize the Sonoff switch."""
-        self._host = host
+    def __init__(self, hass, host, name):
+        from pysonofflan import SonoffSwitch
+
+        _LOGGER.setLevel(logging.DEBUG)
+
         self._name = name
-        self._icon = icon
-        self._state = False
+        self._state = None
+        self._available = False
+        self._shared_state = {}
+        self._sonoff_device = SonoffSwitch(
+            host=host,
+            callback_after_update=self.device_update_callback,
+            shared_state=self._shared_state,
+            logger=_LOGGER,
+            loop=hass.loop,
+            ping_interval=145
+        )
+
+        _LOGGER.debug("HassSonoffSwitch __init__ finished creating "
+                      "SonoffSwitch")
 
     @property
     def name(self):
-        """Get name of Sonoff switch."""
+        _LOGGER.debug("HassSonoffSwitch returning _name: %s" % self._name)
         return self._name
 
     @property
-    def is_on(self):
-        """Check if Sonoff switch is on."""
-        return self._state
+    def available(self) -> bool:
+        """Return if switch is available."""
+        _LOGGER.debug("HassSonoffSwitch returning _available: %s" %
+                      self._available)
+        return self._available
 
     @property
-    def icon(self):
-        """Return the icon."""
-        return self._icon
+    def is_on(self):
+        """Return true if switch is on."""
+        _LOGGER.debug("HassSonoffSwitch returning _state: %s" % self._state)
+        return self._state
 
-    def turn_on(self, **kwargs):
-        """Turn Sonoff switch on."""
-        set_sonoff_state(self._host, "on")
-        self._state = True
+    async def turn_on(self, **kwargs):
+        """Turn the switch on."""
+        _LOGGER.info("Sonoff LAN Mode switch %s switching on" % self._name)
+        await self._sonoff_device.turn_on()
 
-    def turn_off(self, **kwargs):
-        """Turn Sonoff switch off."""
-        set_sonoff_state(self._host, "off")
-        self._state = False
+    async def turn_off(self, **kwargs):
+        """Turn the switch off."""
+        _LOGGER.info("Sonoff LAN Mode switch %s switching off" % self._name)
+        await self._sonoff_device.turn_off()
 
-
-def setup_platform(hass, config, add_devices, discovery_info=None):
-    devices = config.get(CONF_SWITCHES)
-    switches = []
-
-    for object_id, device_config in devices.items():
-        switches.append(
-            SonoffDevice(
-                config.get(CONF_HOST),
-                device_config.get(CONF_FRIENDLY_NAME, object_id),
-                device_config.get(CONF_ICON)
-            )
+    async def device_update_callback(self, callback_self):
+        """Handle state updates announced by the device itself."""
+        _LOGGER.info(
+            "Sonoff LAN Mode switch %s received updated state from "
+            "the device: %s" % (self._name,
+                                self._sonoff_device.state)
         )
+        await self.async_update()
 
-    name = config.get(CONF_NAME)
-    if name:
-        switches.append(
-            SonoffDevice(
-                config.get(CONF_HOST),
-                name,
-                config.get(CONF_ICON)
-            )
-        )
+    async def async_update(self):
+        """Update the device state."""
+        _LOGGER.debug("HassSonoffSwitch async_update called")
+        try:
+            if self._sonoff_device.basic_info is None:
+                _LOGGER.debug(
+                    "Sonoff device basic info still none, waiting for init "
+                    "message")
+                return
 
-    add_devices(switches)
+            self._available = True
+
+            self._state = \
+                self._sonoff_device.state == \
+                self._sonoff_device.SWITCH_STATE_ON
+
+            self.async_schedule_update_ha_state()
+
+        except Exception as ex:
+            if self._available:
+                _LOGGER.warning(
+                    "Could not read state for %s: %s", self.name, ex)
