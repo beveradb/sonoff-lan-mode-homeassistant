@@ -13,7 +13,7 @@ import voluptuous as vol
 from homeassistant.components.switch import (SwitchDevice, PLATFORM_SCHEMA)
 from homeassistant.const import CONF_HOST, CONF_NAME
 
-REQUIREMENTS = ['pysonofflan>=0.2.0']
+REQUIREMENTS = ['pysonofflan>=0.2.0', 'websockets>=7.0']
 
 _LOGGER = logging.getLogger('homeassistant.components.switch.sonoff_lan_mode')
 
