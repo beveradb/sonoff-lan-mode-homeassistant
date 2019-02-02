@@ -14,7 +14,7 @@ Jinja2==2.10
 MarkupSafe==1.1.0
 multidict==4.5.2
 pycparser==2.19
-PyJWT==1.6.4
+PyJWT==1.7.1
 pysonofflan>=0.2.0
 python-slugify==1.2.6
 pytz==2018.9
