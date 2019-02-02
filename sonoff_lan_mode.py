@@ -44,7 +44,7 @@ class HassSonoffSwitch(SwitchDevice):
 
         self._name = name
         self._state = None
-        self._available = True
+        self._available = False
         self._shared_state = {}
         self._sonoff_device = SonoffSwitch(
             host=host,
@@ -55,48 +55,64 @@ class HassSonoffSwitch(SwitchDevice):
             ping_interval=145
         )
 
-        _LOGGER.info("HassSonoffSwitch __init__ finished creating "
-                     "SonoffSwitch")
+        _LOGGER.debug("HassSonoffSwitch __init__ finished creating "
+                      "SonoffSwitch")
 
     @property
     def name(self):
-        _LOGGER.info("HassSonoffSwitch returning _name: %s" % self._name)
+        _LOGGER.debug("HassSonoffSwitch returning _name: %s" % self._name)
         return self._name
 
     @property
     def available(self) -> bool:
         """Return if switch is available."""
-        _LOGGER.info("HassSonoffSwitch returning _available: %s" %
-                     self._available)
+        _LOGGER.debug("HassSonoffSwitch returning _available: %s" %
+                      self._available)
         return self._available
 
     @property
     def is_on(self):
         """Return true if switch is on."""
-        _LOGGER.info("HassSonoffSwitch returning _state: %s" % self._state)
+        _LOGGER.debug("HassSonoffSwitch returning _state: %s" % self._state)
         return self._state
 
     async def turn_on(self, **kwargs):
         """Turn the switch on."""
-        _LOGGER.info("HassSonoffSwitch turn_on called")
+        _LOGGER.info("Sonoff LAN Mode switch %s switching on" % self._name)
         await self._sonoff_device.turn_on()
 
     async def turn_off(self, **kwargs):
         """Turn the switch off."""
-        _LOGGER.info("HassSonoffSwitch turn_off called")
+        _LOGGER.info("Sonoff LAN Mode switch %s switching off" % self._name)
         await self._sonoff_device.turn_off()
 
     async def device_update_callback(self, callback_self):
         """Handle state updates announced by the device itself."""
-        _LOGGER.info("HassSonoffSwitch device_update_callback called")
+        _LOGGER.info(
+            "Sonoff LAN Mode switch %s received updated state from "
+            "the device: %s" % (self._name,
+                                self._sonoff_device.state)
+        )
         await self.async_update()
 
     async def async_update(self):
         """Update the device state."""
-        _LOGGER.info("HassSonoffSwitch async_update called")
+        _LOGGER.debug("HassSonoffSwitch async_update called")
         try:
-            self._state = self._sonoff_device.state == \
-                          self._sonoff_device.SWITCH_STATE_ON
+            if self._sonoff_device.basic_info is None:
+                _LOGGER.debug(
+                    "Sonoff device basic info still none, waiting for init "
+                    "message")
+                return
+
+            self._available = True
+
+            self._state = \
+                self._sonoff_device.state == \
+                self._sonoff_device.SWITCH_STATE_ON
+
+            self.async_schedule_update_ha_state()
+
         except Exception as ex:
             if self._available:
                 _LOGGER.warning(
