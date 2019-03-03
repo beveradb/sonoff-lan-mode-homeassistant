@@ -16,7 +16,7 @@ multidict==4.5.2
 pycparser==2.19
 PyJWT==1.7.1
 pysonofflan>=0.2.0
-python-slugify==2.0.1
+python-slugify==3.0.0
 pytz==2018.9
 pyyaml>=4.2b1
 requests==2.21.0
