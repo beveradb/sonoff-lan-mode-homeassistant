@@ -8,7 +8,7 @@ certifi==2018.11.29
 cffi==1.12.1
 chardet==3.0.4
 cryptography==2.5
-homeassistant==0.88.0
+homeassistant==0.90.1
 idna==2.8
 Jinja2==2.10
 MarkupSafe==1.1.0
