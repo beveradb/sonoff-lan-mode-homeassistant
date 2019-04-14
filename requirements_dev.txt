@@ -11,7 +11,7 @@ cryptography==2.6.1
 homeassistant==0.91.3
 idna==2.8
 Jinja2==2.10.1
-MarkupSafe==1.1.0
+MarkupSafe==1.1.1
 multidict==4.5.2
 pycparser==2.19
 PyJWT==1.7.1
