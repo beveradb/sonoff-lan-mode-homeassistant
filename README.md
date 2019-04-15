@@ -45,7 +45,7 @@ Before you can use this platform to control your Sonoff from Home Assistant, you
 Congrats, you can now uninstall the eWeLink app - you'll won't need it again as your Sonoff can now be controlled directly via WebSocket messages on port 8081!
 
 ## Installation
-To use this platform, copy sonoff_lan_mode.py to "<home assistant config dir>/custom_components/switch" and add the config below to configuration.yaml
+To use this platform, copy switch.py to "<home assistant config dir>/custom_components/sonoff_lan_mode/switch.py" and add the config below to configuration.yaml
 
 ```
 switch:
