@@ -80,11 +80,13 @@ class HassSonoffSwitch(SwitchDevice):
         """Turn the switch on."""
         _LOGGER.info("Sonoff LAN Mode switch %s switching on" % self._name)
         await self._sonoff_device.turn_on()
+        await self.async_update()
 
     async def turn_off(self, **kwargs):
         """Turn the switch off."""
         _LOGGER.info("Sonoff LAN Mode switch %s switching off" % self._name)
         await self._sonoff_device.turn_off()
+        await self.async_update()
 
     async def device_update_callback(self, callback_self):
         """Handle state updates announced by the device itself."""
@@ -94,6 +96,10 @@ class HassSonoffSwitch(SwitchDevice):
                                 self._sonoff_device.state)
         )
         await self.async_update()
+
+    @property
+    def should_poll(self) -> bool:
+        return False
 
     async def async_update(self):
         """Update the device state."""
