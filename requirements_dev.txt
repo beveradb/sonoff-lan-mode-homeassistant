@@ -23,7 +23,7 @@ requests==2.21.0
 ruamel.yaml==0.15.93
 six==1.12.0
 Unidecode==1.0.23
-urllib3==1.24.2
+urllib3==1.25
 uuid==1.30
 voluptuous==0.11.5
 voluptuous-serialize==2.1.0
