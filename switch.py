@@ -38,6 +38,10 @@ class HassSonoffSwitch(SwitchDevice):
     """Home Assistant representation of a Sonoff LAN Mode device."""
 
     def __init__(self, hass, host, name):
+    
+        import sys
+        sys.path.insert(0, '/config/custom_components/sonoff_lan_mode')
+        
         from pysonofflan import SonoffSwitch
 
         _LOGGER.setLevel(logging.DEBUG)
@@ -80,21 +84,21 @@ class HassSonoffSwitch(SwitchDevice):
         """Turn the switch on."""
         _LOGGER.info("Sonoff LAN Mode switch %s switching on" % self._name)
         await self._sonoff_device.turn_on()
-        await self.async_update()
 
     async def turn_off(self, **kwargs):
         """Turn the switch off."""
         _LOGGER.info("Sonoff LAN Mode switch %s switching off" % self._name)
         await self._sonoff_device.turn_off()
-        await self.async_update()
 
     async def device_update_callback(self, callback_self):
         """Handle state updates announced by the device itself."""
         _LOGGER.info(
             "Sonoff LAN Mode switch %s received updated state from "
-            "the device: %s" % (self._name,
-                                self._sonoff_device.state)
+            "the device: %s, available: %s" % (self._name,
+                                self._sonoff_device.state,
+                                self._sonoff_device.available)
         )
+
         await self.async_update()
 
     @property
@@ -111,7 +115,7 @@ class HassSonoffSwitch(SwitchDevice):
                     "message")
                 return
 
-            self._available = True
+            self._available = self._sonoff_device.available
 
             self._state = \
                 self._sonoff_device.state == \
