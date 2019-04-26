@@ -38,10 +38,6 @@ class HassSonoffSwitch(SwitchDevice):
     """Home Assistant representation of a Sonoff LAN Mode device."""
 
     def __init__(self, hass, host, name):
-    
-        import sys
-        sys.path.insert(0, '/config/custom_components/sonoff_lan_mode')
-        
         from pysonofflan import SonoffSwitch
 
         _LOGGER.setLevel(logging.DEBUG)
