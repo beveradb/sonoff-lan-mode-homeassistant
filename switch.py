@@ -11,17 +11,19 @@ import logging
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
 from homeassistant.components.switch import (SwitchDevice, PLATFORM_SCHEMA)
-from homeassistant.const import CONF_HOST, CONF_NAME
+from homeassistant.const import CONF_HOST, CONF_NAME, CONF_ICON
 
 REQUIREMENTS = ['pysonofflan>=0.2.1']
 
 _LOGGER = logging.getLogger('homeassistant.components.switch.sonoff_lan_mode')
 
 DEFAULT_NAME = 'Sonoff Switch'
+DEFAULT_ICON = 'mdi:flash'
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Required(CONF_HOST): cv.string,
     vol.Optional(CONF_NAME, default=DEFAULT_NAME): cv.string,
+    vol.Optional(CONF_ICON, default=DEFAULT_ICON) : cv.string
 })
 
 
@@ -30,19 +32,21 @@ async def async_setup_platform(hass, config, async_add_entities,
     """Set up the Sonoff LAN Mode Switch platform."""
     host = config.get(CONF_HOST)
     name = config.get(CONF_NAME)
+    icon = config.get(CONF_ICON)
 
-    async_add_entities([HassSonoffSwitch(hass, host, name)], True)
+    async_add_entities([HassSonoffSwitch(hass, host, name, icon)], True)
 
 
 class HassSonoffSwitch(SwitchDevice):
     """Home Assistant representation of a Sonoff LAN Mode device."""
 
-    def __init__(self, hass, host, name):
+    def __init__(self, hass, host, name, icon):
         from pysonofflan import SonoffSwitch
 
         _LOGGER.setLevel(logging.DEBUG)
 
         self._name = name
+        self._icon = icon
         self._state = None
         self._available = False
         self._shared_state = {}
@@ -57,6 +61,11 @@ class HassSonoffSwitch(SwitchDevice):
 
         _LOGGER.debug("HassSonoffSwitch __init__ finished creating "
                       "SonoffSwitch")
+
+    @property
+    def icon(self):
+        """Return the icon to use in the frontend, if any."""
+        return self._icon
 
     @property
     def name(self):
