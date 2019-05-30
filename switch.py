@@ -11,19 +11,22 @@ import logging
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
 from homeassistant.components.switch import (SwitchDevice, PLATFORM_SCHEMA)
-from homeassistant.const import CONF_HOST, CONF_NAME, CONF_ICON
+from homeassistant.const import CONF_HOST, CONF_NAME, CONF_ICON, CONF_API_KEY
 
-REQUIREMENTS = ['pysonofflan>=0.3.0']
+REQUIREMENTS = ['pysonofflan>=0.2.1']
 
 _LOGGER = logging.getLogger('homeassistant.components.switch.sonoff_lan_mode')
 
 DEFAULT_NAME = 'Sonoff Switch'
 DEFAULT_ICON = 'mdi:flash'
+CONF_DEVICE_ID = 'device_id'
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
-    vol.Required(CONF_HOST): cv.string,
+    vol.Optional(CONF_HOST): cv.string,
     vol.Optional(CONF_NAME, default=DEFAULT_NAME): cv.string,
-    vol.Optional(CONF_ICON, default=DEFAULT_ICON) : cv.string
+    vol.Optional(CONF_ICON, default=DEFAULT_ICON) : cv.string,
+    vol.Optional(CONF_DEVICE_ID): cv.string,
+    vol.Optional(CONF_API_KEY) : cv.string
 })
 
 
@@ -33,15 +36,21 @@ async def async_setup_platform(hass, config, async_add_entities,
     host = config.get(CONF_HOST)
     name = config.get(CONF_NAME)
     icon = config.get(CONF_ICON)
+    device_id = config.get(CONF_DEVICE_ID)
+    api_key = config.get(CONF_API_KEY)
 
-    async_add_entities([HassSonoffSwitch(hass, host, name, icon)], True)
+    async_add_entities([HassSonoffSwitchR3(hass, host, name, icon, device_id, api_key)], True)
 
 
-class HassSonoffSwitch(SwitchDevice):
+class HassSonoffSwitchR3(SwitchDevice):
     """Home Assistant representation of a Sonoff LAN Mode device."""
 
-    def __init__(self, hass, host, name, icon):
-        from pysonofflan import SonoffSwitch
+    def __init__(self, hass, host, name, icon, device_id, api_key):
+    
+        import sys
+        sys.path.insert(0, '/config/custom_components/sonoff_lan_mode_r3')
+        
+        from pysonofflan3 import SonoffSwitch
 
         _LOGGER.setLevel(logging.DEBUG)
 
@@ -50,13 +59,19 @@ class HassSonoffSwitch(SwitchDevice):
         self._state = None
         self._available = False
         self._shared_state = {}
+
+        self._device_id = device_id
+        self._api_key = api_key
+
         self._sonoff_device = SonoffSwitch(
             host=host,
             callback_after_update=self.device_update_callback,
             shared_state=self._shared_state,
             logger=_LOGGER,
             loop=hass.loop,
-            ping_interval=145
+            ping_interval=145,
+            device_id=device_id,
+            api_key=api_key
         )
 
         _LOGGER.debug("HassSonoffSwitch __init__ finished creating "
