@@ -39,6 +39,12 @@ async def async_setup_platform(hass, config, async_add_entities,
     device_id = config.get(CONF_DEVICE_ID)
     api_key = config.get(CONF_API_KEY)
 
+    # Add path so we can load dependant component from custom_components directory
+    import sys
+    path = hass.config.path('custom_components/sonoff_lan_mode_r3')
+    if path not in sys.path:
+        sys.path.insert(0, path)
+
     async_add_entities([HassSonoffSwitchR3(hass, host, name, icon, device_id, api_key)], True)
 
 
@@ -46,13 +52,8 @@ class HassSonoffSwitchR3(SwitchDevice):
     """Home Assistant representation of a Sonoff LAN Mode device."""
 
     def __init__(self, hass, host, name, icon, device_id, api_key):
-    
-        import sys
-        sys.path.insert(0, '/config/custom_components/sonoff_lan_mode_r3')
-        
+            
         from pysonofflan3 import SonoffSwitch
-
-        _LOGGER.setLevel(logging.DEBUG)
 
         self._name = name
         self._icon = icon
