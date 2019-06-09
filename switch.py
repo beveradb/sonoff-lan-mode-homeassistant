@@ -39,7 +39,9 @@ async def async_setup_platform(hass, config, async_add_entities,
     device_id = config.get(CONF_DEVICE_ID)
     api_key = config.get(CONF_API_KEY)
 
-    # Add path so we can load dependant component from custom_components directory
+    # todo: remove once we have packaged correctly
+    # Add path so we can load dependant component (pysonofflan) from custom_components directory
+    # this support side by side execution 
     import sys
     path = hass.config.path('custom_components/sonoff_lan_mode_r3')
     if path not in sys.path:
