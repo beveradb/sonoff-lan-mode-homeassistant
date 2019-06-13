@@ -37,7 +37,7 @@ Here's a video demonstration of a Sonoff Basic being controlled in LAN mode: [ht
 ## Setup
 Before you can use this platform to control your Sonoff from Home Assistant, you should perform the following setup steps:
 1. Find the "Device ID" of you switch in the eWeLink app, it is under settings
-2. For normal devices (i.e. those not branded DIY), you need to find the "api_key" (which is used for encryption). DIY branded devices do not have encryption on. 
+2. For normal devices (i.e. those not branded DIY and some branded DIY too), you need to find the api key (which is used for encryption). DIY branded devices I was told don't have encryption turned on by an Itead employee, but the only device I've seen does actually have it on.
 
 2a. Capture with V2 firmware: If you have V2 firmware and are using the earlier version of this component, the apikey is visible in the HA logs at startup (part of the "user online response") when debug is turned on (see below)
 2b. Capture during pairing: You can use the method described [here](https://blog.ipsumdomus.com/sonoff-switch-complete-hack-without-firmware-upgrade-1b2d6632c01). Despite this guide being quite old and for older firmware, the early part where the api_key is uncovered still works. Unfortunately this is only visible this way during pairing
