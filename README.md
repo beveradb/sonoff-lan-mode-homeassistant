@@ -6,7 +6,7 @@ Home Assistant platform to control Sonoff switches running the V3+ Itead firmwar
 This is a simple platform to control switch devices which can normally only be controlled using the Itead cloud app (eWeLink). It may be useful to you if you've bought a Sonoff device and want to control it locally, but cannot flash firmware such as [Tasmota](https://github.com/arendst/Sonoff-Tasmota/) for whatever reason (e.g. lack of tools or confidence soldering).
 
 ## Tested Devices
- - Soniff Basic
+ - Sonoff Basic
  - Sonoff RF
  - Sonoff S26
  - Sonoff T1 UK
