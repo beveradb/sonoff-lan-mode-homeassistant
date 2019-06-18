@@ -43,11 +43,13 @@ Before you can use this platform to control your Sonoff from Home Assistant, you
 2b. Capture during pairing: You can use the method described [here](https://blog.ipsumdomus.com/sonoff-switch-complete-hack-without-firmware-upgrade-1b2d6632c01). Despite this guide being quite old and for older firmware, the early part where the api_key is uncovered still works. Unfortunately this is only visible this way during pairing
 
 ## Installation
-To use this platform, copy switch.py to "<home assistant config dir>/custom_components/sonoff_lan_mode/switch.py" and add the config below to configuration.yaml
+To use this platform, unzip the contents of 'sonoff_lan_mode_r3' into your "<home assistant config dir>/custom_components/ directory and add the config below to configuration.yaml
+
+You will also need to be on Home Assistant v94.0 or newer (to pick up the more recent zeroconf dependency).
 
 ```
 switch:
-  - platform: sonoff_lan_mode
+  - platform: sonoff_lan_mode_3
     name: // Switch Name
     device_id: // Local IP address of device
     api_key: // [Optional] Custom icon for device
@@ -57,7 +59,7 @@ Example:
 ```
 switch:
   - platform: sonoff_lan_mode
-    name: Kitchen Ceiling
+    name: Kitchen
     device_id: 1000111111
     api_key: 12345678-90AB-CDEF-1234-567890ABCDEF
     icon: mdi:lightbulb
