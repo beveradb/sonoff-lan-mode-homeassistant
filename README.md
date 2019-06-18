@@ -22,7 +22,7 @@ This is a simple platform to control switch devices which can normally only be c
 - Sonoff Touch EU/US
 - Any other Sonoff / eWeLink single channel device
 
-## Unsupported Devices*
+## Unsupported Devices
  - Multi outlets devices
 
 However, I am very confident that if your device works with the eWeLink app in LAN Mode, we can get it working with this component - we might need a bit of joint investigation (e.g. `tcpdump` of communication from app) first to get it working!
