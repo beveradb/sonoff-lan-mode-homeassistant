@@ -15,7 +15,7 @@ from homeassistant.const import CONF_HOST, CONF_NAME, CONF_ICON, CONF_API_KEY
 
 REQUIREMENTS = ['pysonofflan==0.3.0']
 
-_LOGGER = logging.getLogger('homeassistant.components.switch.sonoff_lan_mode')
+_LOGGER = logging.getLogger('homeassistant.components.switch.sonoff_lan_mode_r3')
 
 DEFAULT_NAME = 'Sonoff Switch'
 DEFAULT_ICON = 'mdi:flash'
