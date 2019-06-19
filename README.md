@@ -64,7 +64,7 @@ switch:
   - platform: sonoff_lan_mode
     name: Kitchen
     device_id: 1000111111
-    api_key: 12345678-90AB-CDEF-1234-567890ABCDEF # not need for devices in DIY mode
+    api_key: 12345678-90AB-CDEF-1234-567890ABCDEF # not needed for devices in DIY mode
     icon: mdi:lightbulb
 ```
 
