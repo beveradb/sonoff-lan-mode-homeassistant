@@ -61,7 +61,7 @@ switch:
 Example:
 ```
 switch:
-  - platform: sonoff_lan_mode
+  - platform: sonoff_lan_mode_r3
     name: Kitchen
     device_id: 1000111111
     api_key: 12345678-90AB-CDEF-1234-567890ABCDEF # not needed for devices in DIY mode
