@@ -81,6 +81,6 @@ logger:
 
 ## Future
 
-It would be easier for users if the api key was reported by the eWeLink app, an issue has been raised. I will post it here once it has undergone the Itead forum moderation process.
+It would be easier for users if the api key was reported by the eWeLink app. Here is a feature request I've raised with Itead https://support.itead.cc/support/discussions/topics/11000026824
 
 
