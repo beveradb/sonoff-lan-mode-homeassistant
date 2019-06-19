@@ -76,7 +76,7 @@ If raising issues with this component, please consider capturing the appropriate
 logger:
   default: warn
   logs:
-    homeassistant.components.switch.sonoff_lan_mode: debug
+    homeassistant.components.switch.sonoff_lan_mode_r3: debug
 ```
 
 ## Future
