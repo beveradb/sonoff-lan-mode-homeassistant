@@ -1,7 +1,7 @@
 # sonoff-lan-mode-homeassistant
 Home Assistant platform to control Sonoff switches running the V3+ Itead firmware, locally (LAN mode).
 
-**This will only work for Sonoff devices running V3+ of the stock (Itead / eWeLink) firmware. For users of V1.8.0 - V2.6.1, please see previous code on the deprecated [V2 Firmware branch](https://github.com/mattsaxon/sonoff-lan-mode-homeassistant/tree/V2-Firmware)**
+**This will only work for Sonoff devices running V3+ of the stock (Itead / eWeLink) firmware. For users of V1.8.0 - V2.6.1, please see the code in this repository https://github.com/beveradb/sonoff-lan-mode-homeassistant**
 
 This is a simple platform to control switch devices which can normally only be controlled using the Itead cloud app (eWeLink). It may be useful to you if you've bought a Sonoff device and want to control it locally, but cannot flash firmware such as [Tasmota](https://github.com/arendst/Sonoff-Tasmota/) for whatever reason (e.g. lack of tools or confidence soldering).
 
@@ -22,7 +22,7 @@ This is a simple platform to control switch devices which can normally only be c
 - Sonoff Touch EU/US
 - Any other Sonoff / eWeLink single channel device
 
-## Unsupported Devices*
+## Unsupported Devices
  - Multi outlets devices
 
 However, I am very confident that if your device works with the eWeLink app in LAN Mode, we can get it working with this component - we might need a bit of joint investigation (e.g. `tcpdump` of communication from app) first to get it working!
@@ -37,17 +37,22 @@ Here's a video demonstration of a Sonoff Basic being controlled in LAN mode: [ht
 ## Setup
 Before you can use this platform to control your Sonoff from Home Assistant, you should perform the following setup steps:
 1. Find the "Device ID" of you switch in the eWeLink app, it is under the device settings.
-2. For normal devices (i.e. those not branded DIY and some branded DIY too), you need to find the api key (which is used for encryption). DIY branded devices, I was told by an Itead employee, don't have encryption turned on, but the only device I've seen does actually have it on!
+2. For non DIY devices, you need to find the api key (which is used for encryption). DIY branded devices, when configured using the jumper switch do not need the api key configured as they run without encryption.
 
-2a. Capture with V2 firmware: If you have V2 firmware and are using the earlier version of this component, the apikey is visible in the HA logs at startup (part of the "user online response") when debug is turned on (see below)
-2b. Capture during pairing: You can use the method described [here](https://blog.ipsumdomus.com/sonoff-switch-complete-hack-without-firmware-upgrade-1b2d6632c01). Despite this guide being quite old and for older firmware, the early part where the api_key is uncovered still works. Unfortunately this is only visible this way during pairing
+To capture the api key there are a couple of options.
+
+* Capture with V2 firmware: If you have V2 firmware and are using the earlier version of this component, the apikey is visible in the HA logs at startup (part of the "user online response") when debug is turned on (see below)
+
+* Capture during pairing: You can use the method described [here](https://blog.ipsumdomus.com/sonoff-switch-complete-hack-without-firmware-upgrade-1b2d6632c01). Despite this guide being quite old and for older firmware, the early part where the api_key is uncovered still works. Unfortunately this is only visible this way during pairing
 
 ## Installation
-To use this platform, copy switch.py to "<home assistant config dir>/custom_components/sonoff_lan_mode/switch.py" and add the config below to configuration.yaml
+To use this platform, unzip the contents of 'sonoff_lan_mode_r3' into your "<home assistant config dir>/custom_components/ directory and add the config below to configuration.yaml
+
+You will also need to be on Home Assistant v94.0 or newer (to pick up the more recent zeroconf dependency).
 
 ```
 switch:
-  - platform: sonoff_lan_mode
+  - platform: sonoff_lan_mode_r3
     name: // Switch Name
     device_id: // Local IP address of device
     api_key: // [Optional] Custom icon for device
@@ -56,10 +61,10 @@ switch:
 Example:
 ```
 switch:
-  - platform: sonoff_lan_mode
-    name: Kitchen Ceiling
+  - platform: sonoff_lan_mode_r3
+    name: Kitchen
     device_id: 1000111111
-    api_key: 12345678-90AB-CDEF-1234-567890ABCDEF
+    api_key: 12345678-90AB-CDEF-1234-567890ABCDEF # not needed for devices in DIY mode
     icon: mdi:lightbulb
 ```
 
@@ -71,11 +76,11 @@ If raising issues with this component, please consider capturing the appropriate
 logger:
   default: warn
   logs:
-    homeassistant.components.switch.sonoff_lan_mode: debug
+    homeassistant.components.switch.sonoff_lan_mode_r3: debug
 ```
 
 ## Future
 
-It would be easier for users if the api key was reported by the eWeLink app, an issue has been raised. I will post it here once it has undergone the Itead forum moderation process.
+It would be easier for users if the api key was reported by the eWeLink app. Here is a feature request I've raised with Itead https://support.itead.cc/support/discussions/topics/11000026824
 
 
