@@ -55,7 +55,7 @@ You will also need to be on Home Assistant v94.0 or newer (to pick up the more r
 switch:
   - platform: sonoff_lan_mode_r3
     name: // Switch Name
-    device_id: // Local IP address of device
+    device_id: // device id from eWeLink
     api_key: // [Optional] Custom icon for device
 ```
 
