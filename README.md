@@ -1,5 +1,5 @@
 # sonoff-lan-mode-homeassistant
-Home Assistant platform to control Sonoff switches running the V3+ Itead firmware, locally (LAN mode).
+Home Assistant platform to control Sonoff switches running the V3+ Itead firmware (tested on 3.0, 3.0.1, 3.1.0, 3.3.0), locally (LAN mode).
 
 **This will only work for Sonoff devices running V3+ of the stock (Itead / eWeLink) firmware. For users of V1.8.0 - V2.6.1, please see the code in this repository https://github.com/beveradb/sonoff-lan-mode-homeassistant**
 
