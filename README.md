@@ -30,7 +30,7 @@ However, I am very confident that if your device works with the eWeLink app in L
 ## What is LAN Mode?
 Since mid 2018, the firmware Itead have shipped with Sonoff devices has provided a feature called "LAN Mode" which allows the device to be controlled directly on the local network using a WebSocket or HTTP REST connection on port 8081.
 
-Whilst older devices only dropped into LAN moe when the internet was unavailable, the latest V3 firmware are designed to be used in LAN mode predominantly. Note: the eWeLink app doesn't show this very well and when you turn it to LAN mode, it doesn't report that it has connected to V3 devices in this mode. Many users are therefore unaware of this and believe the device to be connected via internet, however there is an icon against the device showing a LAN icon when using LAN mode.
+Whilst older devices only dropped into LAN mode when the internet was unavailable, the latest V3 firmware are designed to be used in LAN mode predominantly. Note: the eWeLink app doesn't show this very well and when you turn it to LAN mode, it doesn't report that it has connected to V3 devices in this mode. Many users are therefore unaware of this and believe the device to be connected via internet, however there is an icon against the device showing a LAN icon when using LAN mode.
 
 Here's a video demonstration of a Sonoff Basic being controlled in LAN mode: [https://www.youtube.com/watch?v=sxtt2cNm8g8](https://www.youtube.com/watch?v=sxtt2cNm8g8)
 
@@ -38,6 +38,8 @@ Here's a video demonstration of a Sonoff Basic being controlled in LAN mode: [ht
 Before you can use this platform to control your Sonoff from Home Assistant, you should perform the following setup steps:
 1. Find the "Device ID" of you switch in the eWeLink app, it is under the device settings.
 2. For non DIY devices, you need to find the api key (which is used for encryption). DIY branded devices, when configured using the jumper switch do not need the api key configured as they run without encryption.
+
+**Note**: the api key **IS NOT** the selfApiKey that can be found in taces.
 
 To capture the api key there are a few options;
 
