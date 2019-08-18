@@ -7,9 +7,9 @@ This is a simple platform to control switch devices which can normally only be c
 
 ## Tested Devices
  - Sonoff Basic R2
- - Sonoff Basic R3
+ - Sonoff Basic R3 (both DIY and eWebLink modes)
  - Sonoff RF
- - Sonoff RF R3
+ - Sonoff RF R3 (both DIY and eWebLink modes)
  - Sonoff S20 
  - Sonoff S26
  - Sonoff T1 UK 1 Gang
@@ -17,6 +17,7 @@ This is a simple platform to control switch devices which can normally only be c
 
 ## Expected Supported devices:
 
+- Sonoff Mini
 - Sonoff S85
 - Sonoff T1 US/EU 1 Gang
 - Sonoff S30
@@ -43,7 +44,7 @@ Before you can use this platform to control your Sonoff from Home Assistant, you
 1. Find the "Device ID" of you switch in the eWeLink app, it is under the device settings.
 2. For non DIY devices, you need to find the api key (which is used for encryption). DIY branded devices, when configured using the jumper switch do not need the api key configured as they run without encryption.
 
-**Note**: the api key **IS NOT** the selfApiKey that can be found in taces.
+**Note**: the api key **IS NOT** the selfApiKey that can be found in traces.
 
 To capture the api key there are a few options;
 
@@ -91,4 +92,4 @@ logger:
 
 It would be easier for users if the api key was reported by the eWeLink app. Here is a feature request I've raised with Itead https://support.itead.cc/support/discussions/topics/11000026824
 
-
+At the moment, there is no discovery, but that would be fairly easy to implement.
