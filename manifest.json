@@ -2,7 +2,7 @@
         "domain": "sonoff_lan_mode",
         "name": "Sonoff LAN Mode",
         "documentation": "https://github.com/beveradb/sonoff-lan-mode-homeassistant",
-        "requirements": ["pysonofflan>=0.2.1"],
+        "requirements": ["pysonofflan>=0.3.0"],
         "dependencies": [],
         "codeowners": ["andrew@beveridge.uk"]
 }
