@@ -14,6 +14,7 @@ This is a simple platform to control switch devices which can normally only be c
  - Sonoff S26
  - Sonoff T1 UK 1 Gang
  - Sonoff R2 POW
+ - Sonoff S31
 
 ## Expected Supported devices:
 
@@ -29,6 +30,9 @@ This is a simple platform to control switch devices which can normally only be c
 
 ## Unsupported Devices
  - Multi outlets devices
+ - Sonoff iFan02
+
+ Currently only supports first outlet (work in progress)
 
 However, I am very confident that if your device works with the eWeLink app in LAN Mode, we can get it working with this component - we might need a bit of joint investigation (e.g. `tcpdump` of communication from app) first to get it working!
 
