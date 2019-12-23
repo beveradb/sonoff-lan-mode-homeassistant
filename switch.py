@@ -20,13 +20,15 @@ _LOGGER = logging.getLogger('homeassistant.components.switch.sonoff_lan_mode_r3'
 DEFAULT_NAME = 'Sonoff Switch'
 DEFAULT_ICON = 'mdi:flash'
 CONF_DEVICE_ID = 'device_id'
+CONF_OUTLET = 'outlet'
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Optional(CONF_HOST): cv.string,
     vol.Optional(CONF_NAME, default=DEFAULT_NAME): cv.string,
     vol.Optional(CONF_ICON, default=DEFAULT_ICON) : cv.string,
     vol.Optional(CONF_DEVICE_ID): cv.string,
-    vol.Optional(CONF_API_KEY) : cv.string
+    vol.Optional(CONF_API_KEY) : cv.string,
+    vol.Optional(CONF_OUTLET) : cv.string
 })
 
 
@@ -38,6 +40,7 @@ async def async_setup_platform(hass, config, async_add_entities,
     icon = config.get(CONF_ICON)
     device_id = config.get(CONF_DEVICE_ID)
     api_key = config.get(CONF_API_KEY)
+    outlet = config.get(CONF_OUTLET)
 
     # todo: remove once we have packaged correctly
     # Add path so we can load dependant component (pysonofflan) from custom_components directory
@@ -47,13 +50,13 @@ async def async_setup_platform(hass, config, async_add_entities,
     if path not in sys.path:
         sys.path.insert(0, path)
 
-    async_add_entities([HassSonoffSwitchR3(hass, host, name, icon, device_id, api_key)], True)
+    async_add_entities([HassSonoffSwitchR3(hass, host, name, icon, device_id, api_key, outlet)], True)
 
 
 class HassSonoffSwitchR3(SwitchDevice):
     """Home Assistant representation of a Sonoff LAN Mode device."""
 
-    def __init__(self, hass, host, name, icon, device_id, api_key):
+    def __init__(self, hass, host, name, icon, device_id, api_key, outlet):
             
         from pysonofflan3 import SonoffSwitch
 
@@ -65,6 +68,7 @@ class HassSonoffSwitchR3(SwitchDevice):
 
         self._device_id = device_id
         self._api_key = api_key
+        self._outlet = outlet
 
         self._sonoff_device = SonoffSwitch(
             host=host,
@@ -74,7 +78,8 @@ class HassSonoffSwitchR3(SwitchDevice):
             loop=hass.loop,
             ping_interval=145,
             device_id=device_id,
-            api_key=api_key
+            api_key=api_key,
+            outlet=outlet
         )
 
         _LOGGER.debug("HassSonoffSwitch __init__ finished creating "
