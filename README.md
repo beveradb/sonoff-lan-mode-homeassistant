@@ -15,7 +15,10 @@ This is a simple platform to control switch devices which can normally only be c
  - Sonoff T1 UK 1 Gang
  - Sonoff R2 POW
  - Sonoff S31
-
+ - Sonoff 4CH Pro
+ - Sonoff iFan02
+ - Sonoff TH16
+ 
 ## Expected Supported devices:
 
 - Sonoff Mini
@@ -26,13 +29,10 @@ This is a simple platform to control switch devices which can normally only be c
 - Sonoff Slampher
 - Sonoff SV
 - Sonoff Touch EU/US
-- Any other Sonoff / eWeLink single channel device
+- Any other Sonoff / eWeLink device
 
 ## Unsupported Devices
- - Multi outlets devices
- - Sonoff iFan02
-
- Currently only supports first outlet (work in progress)
+ - None known at this point (although any that can't run a V3+ firmware will not work)
 
 However, I am very confident that if your device works with the eWeLink app in LAN Mode, we can get it working with this component - we might need a bit of joint investigation (e.g. `tcpdump` of communication from app) first to get it working!
 
@@ -62,6 +62,7 @@ switch:
     device_id: // device id (e.g. obtained from eWeLink app)
     api_key: // [Required unless in DIY mode] api_key obtained during pairing or from V2 firmware trace
     icon: // [Optional] Custom icon for device
+    outlet: // [Optional] Outlet number, numbered form 0 to 3 on a 4CH as opposed to 1-4 as in the eWeLink interface
 ```
 
 Example:
@@ -72,6 +73,7 @@ switch:
     device_id: 1000111111
     api_key: 12345678-90AB-CDEF-1234-567890ABCDEF # not needed for devices in DIY mode
     icon: mdi:lightbulb
+    outlet: 0
 ```
 
 ## Debugging
@@ -90,3 +92,7 @@ logger:
 It would be easier for users if the api key was reported by the eWeLink app. Here is a feature request I've raised with Itead https://support.itead.cc/support/discussions/topics/11000026824
 
 At the moment, there is no discovery, but that would be fairly easy to implement.
+
+## See Also
+
+There is a thread on the Home Assistant Community here discussing this component https://community.home-assistant.io/t/new-custom-component-sonoff-lan-mode-local-with-stock-firmware/88132/66
