@@ -1,3 +1,5 @@
+[![Latest PyPi Release](https://img.shields.io/pypi/v/pysonofflanr3.svg)](https://pypi.python.org/pypi/pysonofflanr3) [![Updates](https://pyup.io/repos/github/mattsaxon/sonoff-lan-mode-homeassistant/shield.svg)](https://pyup.io/repos/github/mattsaxon/sonoff-lan-mode-homeassistant/) [![Python 3](https://pyup.io/repos/github/mattsaxon/sonoff-lan-mode-homeassistant/python-3-shield.svg)](https://pyup.io/repos/github/mattsaxon/sonoff-lan-mode-homeassistant/pysonofflan/) [![Buy Me A Coffee](https://www.buymeacoffee.com/assets/img/guidelines/download-assets-sm-2.svg)](https://www.buymeacoffee.com/XTOsBAc)
+
 # sonoff-lan-mode-homeassistant
 Home Assistant platform to control Sonoff switches running the V3+ Itead firmware (tested on 3.0, 3.0.1, 3.1.0, 3.3.0), locally (LAN mode).
 
