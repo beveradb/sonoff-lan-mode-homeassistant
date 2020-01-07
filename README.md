@@ -1,6 +1,6 @@
-[![Updates](https://pyup.io/repos/github/mattsaxon/sonoff-lan-home-assistant/shield.svg)](https://pyup.io/repos/github/sonoff-lan-home-assistant/pysonofflan/)
+[![Updates](https://pyup.io/repos/github/mattsaxon/sonoff-lan-mode-homeassistant/shield.svg)](https://pyup.io/repos/github/mattsaxon/sonoff-lan-mode-homeassistant/)
 
-[![Python 3](https://pyup.io/repos/github/mattsaxon/sonoff-lan-home-assistant/python-3-shield.svg)](https://pyup.io/repos/github/mattsaxon/sonoff-lan-home-assistant/pysonofflan/)
+[![Python 3](https://pyup.io/repos/github/mattsaxon/sonoff-lan-mode-homeassistant/python-3-shield.svg)](https://pyup.io/repos/github/mattsaxon/sonoff-lan-mode-homeassistant/pysonofflan/)
 
 [![Buy Me A Coffee](https://www.buymeacoffee.com/assets/img/guidelines/download-assets-sm-2.svg)](https://www.buymeacoffee.com/XTOsBAc)
 
