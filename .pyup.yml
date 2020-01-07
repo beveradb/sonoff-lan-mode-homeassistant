@@ -26,7 +26,7 @@ search: False
 # default: empty
 # allowed: list
 requirements:
-  - requirements_dev.txt:
+  - /requirements_dev.txt:
       # update all dependencies and pin them
       update: all
       pin: True
