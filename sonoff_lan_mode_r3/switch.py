@@ -4,7 +4,7 @@ Basic), plugs (e.g. Sonoff S20), and wall switches (e.g. Sonoff Touch),
 when these devices are in "LAN Mode", directly over the local network.
 
 For more details about this platform, please refer to the documentation at
-https://github.com/beveradb/sonoff-lan-mode-homeassistant
+https://github.com/mattsaxon/sonoff-lan-mode-homeassistant
 """
 import logging
 
@@ -13,7 +13,7 @@ import voluptuous as vol
 from homeassistant.components.switch import (SwitchDevice, PLATFORM_SCHEMA)
 from homeassistant.const import CONF_HOST, CONF_NAME, CONF_ICON, CONF_API_KEY
 
-REQUIREMENTS = ['pysonofflan==0.3.0']
+REQUIREMENTS = ['pysonofflanr3==1.1.0']
 
 _LOGGER = logging.getLogger('homeassistant.components.switch.sonoff_lan_mode_r3')
 
@@ -42,13 +42,11 @@ async def async_setup_platform(hass, config, async_add_entities,
     api_key = config.get(CONF_API_KEY)
     outlet = config.get(CONF_OUTLET)
 
-    # todo: remove once we have packaged correctly
-    # Add path so we can load dependant component (pysonofflan) from custom_components directory
-    # this support side by side execution 
-    import sys
-    path = hass.config.path('custom_components/sonoff_lan_mode_r3')
-    if path not in sys.path:
-        sys.path.insert(0, path)
+    # Add path so we can load dependant component (pysonofflanr3) from custom_components directory 
+    #import sys
+    #path = hass.config.path('custom_components/sonoff_lan_mode_r3')
+    #if path not in sys.path:
+    #    sys.path.insert(0, path)
 
     async_add_entities([HassSonoffSwitchR3(hass, host, name, icon, device_id, api_key, outlet)], True)
 
@@ -58,7 +56,7 @@ class HassSonoffSwitchR3(SwitchDevice):
 
     def __init__(self, hass, host, name, icon, device_id, api_key, outlet):
             
-        from pysonofflan3 import SonoffSwitch
+        from pysonofflanr3 import SonoffSwitch
 
         self._name = name
         self._icon = icon

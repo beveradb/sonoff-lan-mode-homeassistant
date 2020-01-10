@@ -53,7 +53,7 @@ Before you can use this platform to control your Sonoff from Home Assistant, you
 See https://github.com/mattsaxon/pysonofflan/wiki/Finding-the-API__Key
 
 ## Installation
-To use this platform, unzip the contents of 'sonoff_lan_mode_r3' into your "<home assistant config dir>/custom_components/ directory and add the config below to configuration.yaml
+To use this platform, copy the folder 'sonoff_lan_mode_r3' into your "<home assistant config dir>/custom_components/ directory and add the config below to configuration.yaml
 
 You will also need to be on Home Assistant v94.0 or newer (to pick up the more recent zeroconf dependency).
 
