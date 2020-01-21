@@ -50,7 +50,7 @@ Before you can use this platform to control your Sonoff from Home Assistant, you
 1. Find the "Device ID" of you switch in the eWeLink app, it is under the device settings.
 2. For non DIY devices, you need to find the api key (which is used for encryption). DIY branded devices, when configured using the jumper switch do not need the api key configured as they run without encryption.
 
-See https://github.com/mattsaxon/pysonofflan/wiki/Finding-the-API__Key
+See https://pysonofflanr3.readthedocs.io/encryption.html
 
 ## Installation
 To use this platform, copy the folder 'sonoff_lan_mode_r3' into your "<home assistant config dir>/custom_components/ directory and add the config below to configuration.yaml
