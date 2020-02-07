@@ -31,10 +31,10 @@ This is a simple platform to control switch devices which can normally only be c
 - Sonoff Slampher
 - Sonoff SV
 - Sonoff Touch EU/US
-- Any other Sonoff / eWeLink device
 
 ## Unsupported Devices
- - None known at this point (although any that can't run a V3+ firmware will not work)
+ - Sonoff iFan03
+ - Any that can't run V3+ firmware
 
 However, I am very confident that if your device works with the eWeLink app in LAN Mode, we can get it working with this component - we might need a bit of joint investigation (e.g. `tcpdump` of communication from app) first to get it working!
 
