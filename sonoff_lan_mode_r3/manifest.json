@@ -2,7 +2,7 @@
         "domain": "sonoff_lan_mode_r3",
         "name": "Sonoff v3+ Firmware Lan Mode Component",
         "documentation": "https://github.com/mattsaxon/sonoff-lan-mode-homeassistant",
-        "requirements": ["pysonofflanr3==1.1.1"],
+        "requirements": ["pysonofflanr3==1.1.2"],
         "dependencies": [],
         "codeowners": ["@mattsaxon"]
 }
