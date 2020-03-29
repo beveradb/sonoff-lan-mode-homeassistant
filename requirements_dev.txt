@@ -1,2 +1,2 @@
-homeassisant==0.103.4
-pysonofflanr3==1.1.0
+homeassisant==0.107.7
+pysonofflanr3==1.1.4
