@@ -13,7 +13,7 @@ import voluptuous as vol
 from homeassistant.components.switch import (SwitchDevice, PLATFORM_SCHEMA)
 from homeassistant.const import CONF_HOST, CONF_NAME, CONF_ICON, CONF_API_KEY
 
-REQUIREMENTS = ['pysonofflanr3==1.1.3']
+REQUIREMENTS = ['pysonofflanr3==1.1.4']
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -56,7 +56,7 @@ class HassSonoffSwitchR3(SwitchDevice):
 
     def __init__(self, hass, host, name, icon, device_id, api_key, outlet):
             
-        from pysonofflanr3 import SonoffSwitch
+        from pysonofflanr3 import SonoffSwitch  # pylint: disable=import-error
 
         self._name = name
         self._icon = icon
