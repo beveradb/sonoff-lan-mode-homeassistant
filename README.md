@@ -98,3 +98,5 @@ At the moment, there is no discovery, but that would be fairly easy to implement
 ## See Also
 
 There is a thread on the Home Assistant Community here discussing this component https://community.home-assistant.io/t/new-custom-component-sonoff-lan-mode-local-with-stock-firmware/88132/66
+
+[ ~ Dependencies scanned by PyUp.io ~ ]
