@@ -20,7 +20,8 @@ This is a simple platform to control switch devices which can normally only be c
  - Sonoff 4CH Pro
  - Sonoff iFan02
  - Sonoff TH16
- 
+ - Sonoff SV
+
 ## Expected Supported devices:
 
 - Sonoff Mini
@@ -29,7 +30,6 @@ This is a simple platform to control switch devices which can normally only be c
 - Sonoff S30
 - Sonoff S31 Lite
 - Sonoff Slampher
-- Sonoff SV
 - Sonoff Touch EU/US
 
 ## Unsupported Devices
