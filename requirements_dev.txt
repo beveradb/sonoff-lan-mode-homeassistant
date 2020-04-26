@@ -1,2 +1,2 @@
-homeassistant==0.107.7
+homeassistant==0.108.9
 pysonofflanr3==1.1.4
