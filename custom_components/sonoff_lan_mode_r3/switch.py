@@ -106,12 +106,12 @@ class HassSonoffSwitchR3(SwitchDevice):
         _LOGGER.debug("HassSonoffSwitch returning _state: %s" % self._state)
         return self._state
 
-    async def turn_on(self, **kwargs):
+    async def async_turn_on(self, **kwargs):
         """Turn the switch on."""
         _LOGGER.info("Sonoff LAN Mode switch %s switching on" % self._name)
         await self._sonoff_device.turn_on()
 
-    async def turn_off(self, **kwargs):
+    async def async_turn_off(self, **kwargs):
         """Turn the switch off."""
         _LOGGER.info("Sonoff LAN Mode switch %s switching off" % self._name)
         await self._sonoff_device.turn_off()
