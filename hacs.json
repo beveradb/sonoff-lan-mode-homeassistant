@@ -1,4 +1,5 @@
 {
 "name": "SONOFF LAN MODE R3",
-"domains": ["switch"]
+"domains": ["switch"],
+"render_readme": true
 }
