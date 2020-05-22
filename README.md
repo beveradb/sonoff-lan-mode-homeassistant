@@ -21,6 +21,7 @@ This is a simple platform to control switch devices which can normally only be c
  - Sonoff iFan02
  - Sonoff TH16
  - Sonoff SV
+ - Hoch/WDYK ZJSB9-80 Wifi
 
 ## Expected Supported devices:
 
