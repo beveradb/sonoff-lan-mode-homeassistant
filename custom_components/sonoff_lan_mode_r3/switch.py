@@ -10,7 +10,7 @@ import logging
 
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
-from homeassistant.components.switch import (SwitchDevice, PLATFORM_SCHEMA)
+from homeassistant.components.switch import (SwitchEntity, PLATFORM_SCHEMA)
 from homeassistant.const import CONF_HOST, CONF_NAME, CONF_ICON, CONF_API_KEY
 
 REQUIREMENTS = ['pysonofflanr3==1.1.4']
@@ -51,7 +51,7 @@ async def async_setup_platform(hass, config, async_add_entities,
     async_add_entities([HassSonoffSwitchR3(hass, host, name, icon, device_id, api_key, outlet)], True)
 
 
-class HassSonoffSwitchR3(SwitchDevice):
+class HassSonoffSwitchR3(SwitchEntity):
     """Home Assistant representation of a Sonoff LAN Mode device."""
 
     def __init__(self, hass, host, name, icon, device_id, api_key, outlet):
