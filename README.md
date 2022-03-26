@@ -1,3 +1,7 @@
+# No longer maintained!
+
+This component is no longer being maintained, instead use https://github.com/AlexxIT/SonoffLAN, which is more functional and stable. Any future contributions I make will be to this repo.
+
 # sonoff-lan-mode-homeassistant
 
 Home Assistant platform to control Sonoff switches running the V2 Itead firmware (tested on  V1.8.0 - V2.6.1), locally (LAN mode).
